@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupportPilot - Ticket Processing</title>
+    <!-- Use Inter font for a modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #1e1e2f;
+            --card-bg: #2a2a40;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #3f3f5a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            gap: 10px;
+        }
+
+        .logo-icon {
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border-right: 3px solid var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+
+        /* Two Column Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-main);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background-color: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* Results Card */
+        .result-box {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .result-box.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .ticket-id {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .priority-badge.p1 { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .priority-badge.p2 { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .priority-badge.p3 { background-color: rgba(59, 130, 246, 0.1); color: var(--primary); }
+        .priority-badge.p4 { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .result-value {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Ticket List */
+        .ticket-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ticket-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .ticket-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .ticket-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .ticket-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .icon-network { background-color: rgba(59, 130, 246, 0.1); color: var(--primary); }
+        .icon-vpn { background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .icon-software { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .icon-password { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .icon-hardware { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .icon-system { background-color: rgba(71, 85, 105, 0.1); color: #475569; }
+
+        .ticket-details h4 {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .ticket-details p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .ticket-status {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--primary);
+            background-color: rgba(99, 102, 241, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 15px;
+        }
+        
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Stickers CSS */
+        .sticker {
+            position: fixed;
+            z-index: 0;
+            opacity: 0.05;
+            color: var(--primary);
+            pointer-events: none;
+        }
+        .sticker-1 { top: 10%; right: 5%; font-size: 15rem; transform: rotate(-15deg); }
+        .sticker-2 { bottom: 10%; left: 22%; font-size: 12rem; transform: rotate(20deg); color: var(--success); }
+        .sticker-3 { top: 40%; right: 30%; font-size: 8rem; transform: rotate(10deg); color: var(--warning); }
+        .sticker-4 { bottom: 30%; right: 10%; font-size: 10rem; transform: rotate(-25deg); color: var(--danger); }
+    </style>
+</head>
+<body>
+    <!-- Background Stickers -->
+    <i class="fa-solid fa-rocket sticker sticker-1"></i>
+    <i class="fa-solid fa-headset sticker sticker-2"></i>
+    <i class="fa-solid fa-ticket sticker sticker-3"></i>
+    <i class="fa-solid fa-microchip sticker sticker-4"></i>
+
+    <div class="sidebar" style="position: relative; z-index: 1;">
+        <div class="logo">
+            <div class="logo-icon">SP</div>
+            SupportPilot
+        </div>
+        <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="#" class="nav-item active"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-robot"></i> AI Agent</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-plug"></i> Integrations</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1>Ticket Processing & Classification</h1>
+                <p>Submit and classify IT support tickets</p>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <!-- Submission Form -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa-solid fa-circle-plus"></i> Submit New Ticket
+                </div>
+                <form id="ticketForm">
+                    <div class="form-group">
+                        <label class="form-label">Ticket Title</label>
+                        <input type="text" id="title" class="form-control" placeholder="Brief summary of the issue" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea id="description" class="form-control" placeholder="Provide details about the issue..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Requester Name</label>
+                        <input type="text" id="employee_name" class="form-control" placeholder="John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Requester Email</label>
+                        <input type="email" id="email" class="form-control" placeholder="john.doe@company.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <select id="department" class="form-control">
+                            <option value="IT">IT</option>
+                            <option value="Sales">Sales</option>
+                            <option value="HR">HR</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Executive">Executive</option>
+                            <option value="Production">Production</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submitBtn">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Ticket
+                    </button>
+                    
+                    <div class="loading" id="loadingIndicator">
+                        <i class="fa-solid fa-circle-notch"></i> Processing with AI...
+                    </div>
+                </form>
+            </div>
+
+            <!-- AI Results & Recent Tickets -->
+            <div>
+                <div class="card" style="margin-bottom: 25px;">
+                    <div class="card-header">
+                        <i class="fa-solid fa-robot"></i> AI Classification Results
+                    </div>
+                    
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <div class="stat-value" id="stat-accuracy">--%</div>
+                            <div class="stat-label">AI Confidence</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="stat-time">--s</div>
+                            <div class="stat-label">Avg. Processing Time</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="stat-total">{{ total_tickets }}</div>
+                            <div class="stat-label">Total Tickets</div>
+                        </div>
+                    </div>
+
+                    <!-- Result Box (Hidden by default) -->
+                    <div class="result-box" id="resultBox">
+                        <div class="result-header">
+                            <div class="ticket-id" id="res-ticket-id">Ticket #T-NEW</div>
+                            <div class="priority-badge p1" id="res-priority-badge">High Priority</div>
+                        </div>
+                        <div class="result-grid">
+                            <div class="result-item">
+                                <span class="result-label">Category</span>
+                                <span class="result-value" id="res-category">Network Connectivity</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Severity</span>
+                                <span class="result-value" id="res-severity">High</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Priority</span>
+                                <span class="result-value" id="res-priority">P1 - Critical</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ticket-list" id="recentTickets">
+                        <!-- Recent tickets rendered by server -->
+                        {% for ticket in tickets %}
+                        <div class="ticket-item">
+                            <div class="ticket-info">
+                                {% set icon_class = 'icon-system' %}
+                                {% set icon_name = 'fa-server' %}
+                                
+                                {% if ticket.category == 'Network' %}
+                                    {% set icon_class = 'icon-network' %}
+                                    {% set icon_name = 'fa-wifi' %}
+                                {% elif ticket.category == 'VPN' %}
+                                    {% set icon_class = 'icon-vpn' %}
+                                    {% set icon_name = 'fa-shield-halved' %}
+                                {% elif ticket.category == 'Software' %}
+                                    {% set icon_class = 'icon-software' %}
+                                    {% set icon_name = 'fa-laptop-code' %}
+                                {% elif ticket.category == 'Password' %}
+                                    {% set icon_class = 'icon-password' %}
+                                    {% set icon_name = 'fa-lock' %}
+                                {% elif ticket.category == 'Hardware' %}
+                                    {% set icon_class = 'icon-hardware' %}
+                                    {% set icon_name = 'fa-desktop' %}
+                                {% endif %}
+                                
+                                <div class="ticket-icon {{ icon_class }}">
+                                    <i class="fa-solid {{ icon_name }}"></i>
+                                </div>
+                                <div class="ticket-details">
+                                    <h4>{{ ticket.title }}</h4>
+                                    <p>{{ ticket.category }} • Priority {{ ticket.priority }}</p>
+                                </div>
+                            </div>
+                            <div class="ticket-status">Classified</div>
+                        </div>
+                        {% else %}
+                        <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 10px;">No tickets submitted yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('ticketForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const resultBox = document.getElementById('resultBox');
+            
+            // Gather data
+            const payload = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                employee_name: document.getElementById('employee_name').value,
+                email: document.getElementById('email').value,
+                department: document.getElementById('department').value
+            };
+            
+            // UI State - loading
+            submitBtn.disabled = true;
+            loadingIndicator.style.display = 'flex';
+            
+            const startTime = performance.now();
+            
+            try {
+                const response = await fetch('/ticket', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                const endTime = performance.now();
+                const processingTime = ((endTime - startTime) / 1000).toFixed(2);
+                
+                if (response.ok) {
+                    // Update Results UI
+                    document.getElementById('res-ticket-id').textContent = `Ticket #T-${data.ticket_id.toString().padStart(4, '0')}`;
+                    document.getElementById('res-category').textContent = data.category;
+                    document.getElementById('res-severity').textContent = data.severity;
+                    document.getElementById('res-priority').textContent = data.priority;
+                    
+                    const badge = document.getElementById('res-priority-badge');
+                    badge.textContent = `${data.priority} Priority`;
+                    badge.className = `priority-badge ${data.priority.toLowerCase()}`;
+                    
+                    document.getElementById('stat-accuracy').textContent = `${data.confidence}%`;
+                    document.getElementById('stat-time').textContent = `${processingTime}s`;
+                    
+                    const totalElem = document.getElementById('stat-total');
+                    if (totalElem) {
+                        totalElem.textContent = parseInt(totalElem.textContent || 0) + 1;
+                    }
+                    
+                    // Show result box
+                    resultBox.classList.remove('active');
+                    void resultBox.offsetWidth; // trigger reflow
+                    resultBox.classList.add('active');
+                    
+                    // Prepend to list
+                    const list = document.getElementById('recentTickets');
+                    
+                    // Determine icon based on category
+                    let iconClass = 'icon-system';
+                    let iconName = 'fa-server';
+                    
+                    if(data.category === 'Network') { iconClass = 'icon-network'; iconName = 'fa-wifi'; }
+                    else if(data.category === 'VPN') { iconClass = 'icon-vpn'; iconName = 'fa-shield-halved'; }
+                    else if(data.category === 'Software') { iconClass = 'icon-software'; iconName = 'fa-laptop-code'; }
+                    else if(data.category === 'Password') { iconClass = 'icon-password'; iconName = 'fa-lock'; }
+                    else if(data.category === 'Hardware') { iconClass = 'icon-hardware'; iconName = 'fa-desktop'; }
+                    
+                    const newItem = document.createElement('div');
+                    newItem.className = 'ticket-item';
+                    newItem.innerHTML = `
+                        <div class="ticket-info">
+                            <div class="ticket-icon ${iconClass}">
+                                <i class="fa-solid ${iconName}"></i>
+                            </div>
+                            <div class="ticket-details">
+                                <h4>${data.title}</h4>
+                                <p>${data.category} • Priority ${data.priority}</p>
+                            </div>
+                        </div>
+                        <div class="ticket-status">Classified</div>
+                    `;
+                    
+                    // Remove "No tickets" message if present
+                    if(list.children.length === 1 && list.children[0].tagName === 'P') {
+                        list.innerHTML = '';
+                    }
+                    
+                    list.insertBefore(newItem, list.firstChild);
+                    
+                    // Keep list at 5 items
+                    if(list.children.length > 5) {
+                        list.removeChild(list.lastChild);
+                    }
+                    
+                    // Reset form
+                    document.getElementById('ticketForm').reset();
+                } else {
+                    alert('Error submitting ticket: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to connect to the server.');
+            } finally {
+                // Restore UI state
+                submitBtn.disabled = false;
+                loadingIndicator.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

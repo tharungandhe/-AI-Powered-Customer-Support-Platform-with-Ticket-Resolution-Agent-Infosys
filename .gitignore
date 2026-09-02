@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+tickets.db
+models/*.pkl
+.env
+.venv/
+venv/
+env/
