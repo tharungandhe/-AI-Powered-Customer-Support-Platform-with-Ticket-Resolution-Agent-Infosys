@@ -2,3 +2,7 @@ Flask
 scikit-learn
 pandas
 joblib
+PyJWT
+numpy
+google-genai
+Flask-JWT-Extended

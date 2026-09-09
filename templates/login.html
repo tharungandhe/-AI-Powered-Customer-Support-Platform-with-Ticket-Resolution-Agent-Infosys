@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in to SupportPilot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6; /* Blue matching the image */
+            --primary-hover: #2563eb;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --border-color: #e2e8f0;
+            --bg-light: #f8fafc;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.6)), url('/static/bg.jpg') center/cover no-repeat;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 25px;
+        }
+
+        .logo i {
+            color: #ffffff;
+            font-size: 2.2rem;
+            transform: rotate(-15deg);
+        }
+
+        .header-section h1 {
+            color: #ffffff;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-section p {
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+
+        .forgot-password {
+            display: block;
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 20px;
+            margin-top: -8px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .divider:not(:empty)::before {
+            margin-right: 15px;
+        }
+
+        .divider:not(:empty)::after {
+            margin-left: 15px;
+        }
+
+        .btn-social {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .btn-social:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .btn-google img {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-apple {
+            background-color: black;
+            color: white;
+            border: none;
+        }
+
+        .btn-apple:hover {
+            background-color: #1a1a1a;
+        }
+
+        .btn-apple i {
+            font-size: 1.2rem;
+        }
+
+        .card-footer {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--text-gray);
+        }
+
+        .card-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .page-footer {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        .page-footer a {
+            color: #e2e8f0;
+            text-decoration: none;
+        }
+        
+        .page-footer a:hover {
+            color: #ffffff;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: none;
+            text-align: center;
+            background-color: rgba(239, 68, 68, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        /* Bring content above stickers */
+        .header-section, .login-card, .page-footer {
+            z-index: 1;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <div class="logo">
+            <i class="fa-solid fa-rocket"></i> SupportPilot
+        </div>
+        <h1>Sign in to SupportPilot</h1>
+        <p>Empower your customer support with AI.</p>
+    </div>
+
+    <div class="login-card">
+        <div id="errorMessage" class="error-message"></div>
+        <form id="loginForm">
+            <!-- Dummy inputs to catch aggressive browser autofill on page load -->
+            <input type="email" style="opacity: 0; position: absolute; top: -9999px;" tabindex="-1" aria-hidden="true">
+            <input type="password" style="opacity: 0; position: absolute; top: -9999px;" tabindex="-1" aria-hidden="true">
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <div class="input-group">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input type="email" id="email" class="form-control" placeholder="yourname@example.com" autocomplete="username" required>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password" autocomplete="current-password" required>
+                </div>
+            </div>
+
+            <a href="#" class="forgot-password">Forgot password?</a>
+
+            <button type="submit" class="btn btn-primary" id="loginBtn">
+                Sign In
+            </button>
+        </form>
+
+        <div class="divider">Or</div>
+
+        <button type="button" class="btn btn-social btn-google" id="googleLoginBtn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
+            Sign in with Google
+        </button>
+
+        <button type="button" class="btn btn-apple">
+            <i class="fa-brands fa-apple"></i>
+            Sign in with Apple
+        </button>
+
+        <div class="card-footer">
+            Don't have an account? <a href="#">Sign Up</a>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('errorMessage');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Signing In...';
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: document.getElementById('email').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Sign In';
+            }
+        });
+
+        document.getElementById('googleLoginBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('googleLoginBtn');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            // Save original content
+            const originalContent = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Connecting to Google...';
+            errorDiv.style.display = 'none';
+
+            try {
+                // Simulate a slight network delay for realism
+                await new Promise(r => setTimeout(r, 800));
+                
+                const response = await fetch('/api/login/google/mock', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    const data = await response.json();
+                    errorDiv.textContent = data.error || 'Google Login failed';
+                    errorDiv.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }
+        });
+    </script>
+</body>
+</html>

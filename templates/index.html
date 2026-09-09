@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +11,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg-color: #1e1e2f;
-            --card-bg: #2a2a40;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #3f3f5a;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
@@ -80,7 +81,7 @@
         }
 
         .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(0, 0, 0, 0.05);
             color: var(--text-main);
         }
 
@@ -163,7 +164,7 @@
             border-radius: 8px;
             font-size: 0.95rem;
             transition: border-color 0.2s, box-shadow 0.2s;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: var(--card-bg);
             color: var(--text-main);
         }
 
@@ -206,11 +207,11 @@
         .btn:hover {
             background-color: var(--primary-hover);
         }
-        
+
         .btn:active {
             transform: scale(0.98);
         }
-        
+
         .btn:disabled {
             background-color: var(--text-muted);
             cursor: not-allowed;
@@ -218,7 +219,7 @@
 
         /* Results Card */
         .result-box {
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
@@ -230,10 +231,17 @@
             display: block;
             animation: fadeIn 0.4s ease-out;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .result-header {
@@ -256,11 +264,26 @@
             background-color: rgba(239, 68, 68, 0.1);
             color: var(--danger);
         }
-        
-        .priority-badge.p1 { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .priority-badge.p2 { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .priority-badge.p3 { background-color: rgba(59, 130, 246, 0.1); color: var(--primary); }
-        .priority-badge.p4 { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+        .priority-badge.p1 {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .priority-badge.p2 {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .priority-badge.p3 {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+        }
+
+        .priority-badge.p4 {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
 
         .result-grid {
             display: grid;
@@ -293,7 +316,7 @@
 
         .stat-box {
             flex: 1;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 15px;
@@ -326,7 +349,7 @@
             padding: 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: var(--card-bg);
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
@@ -351,12 +374,35 @@
             font-size: 1rem;
         }
 
-        .icon-network { background-color: rgba(59, 130, 246, 0.1); color: var(--primary); }
-        .icon-vpn { background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
-        .icon-software { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .icon-password { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .icon-hardware { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .icon-system { background-color: rgba(71, 85, 105, 0.1); color: #475569; }
+        .icon-network {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+        }
+
+        .icon-vpn {
+            background-color: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+        }
+
+        .icon-software {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .icon-password {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .icon-hardware {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .icon-system {
+            background-color: rgba(71, 85, 105, 0.1);
+            color: #475569;
+        }
 
         .ticket-details h4 {
             font-size: 0.95rem;
@@ -377,7 +423,7 @@
             padding: 4px 10px;
             border-radius: 12px;
         }
-        
+
         .loading {
             display: none;
             align-items: center;
@@ -386,48 +432,79 @@
             font-weight: 500;
             margin-top: 15px;
         }
-        
+
         .loading i {
             animation: spin 1s linear infinite;
         }
-        
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
-        /* Stickers CSS */
-        .sticker {
+        /* Animated Background Stickers */
+        .bg-stickers {
             position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
             z-index: 0;
-            opacity: 0.05;
-            color: var(--primary);
             pointer-events: none;
         }
-        .sticker-1 { top: 10%; right: 5%; font-size: 15rem; transform: rotate(-15deg); }
-        .sticker-2 { bottom: 10%; left: 22%; font-size: 12rem; transform: rotate(20deg); color: var(--success); }
-        .sticker-3 { top: 40%; right: 30%; font-size: 8rem; transform: rotate(10deg); color: var(--warning); }
-        .sticker-4 { bottom: 30%; right: 10%; font-size: 10rem; transform: rotate(-25deg); color: var(--danger); }
+        .sticker { 
+            position: absolute; 
+            opacity: 0.04; 
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+            animation: float 20s infinite ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            33% { transform: translateY(-20px) rotate(10deg) scale(1.05); }
+            66% { transform: translateY(15px) rotate(-5deg) scale(0.95); }
+            100% { transform: translateY(0) rotate(0deg) scale(1); }
+        }
+        
+        .sticker-1 { top: 10%; right: 5%; font-size: 16rem; color: var(--primary); animation-delay: 0s; }
+        .sticker-2 { bottom: 10%; left: 22%; font-size: 14rem; color: var(--success); animation-delay: -5s; }
+        .sticker-3 { top: 40%; right: 30%; font-size: 12rem; color: var(--warning); animation-delay: -10s; }
+        .sticker-4 { bottom: 30%; right: 10%; font-size: 15rem; color: var(--danger); animation-delay: -15s; }
+        .sticker-5 { top: 20%; left: 40%; font-size: 10rem; color: #8b5cf6; animation-delay: -7s; }
+        .sticker-6 { top: 70%; right: 40%; font-size: 18rem; color: #06b6d4; animation-delay: -12s; }
+        .sticker-7 { top: -5%; left: 60%; font-size: 20rem; color: #ec4899; animation-delay: -3s; }
     </style>
 </head>
+
 <body>
-    <!-- Background Stickers -->
-    <i class="fa-solid fa-rocket sticker sticker-1"></i>
-    <i class="fa-solid fa-headset sticker sticker-2"></i>
-    <i class="fa-solid fa-ticket sticker sticker-3"></i>
-    <i class="fa-solid fa-microchip sticker sticker-4"></i>
+    <div class="bg-stickers">
+        <i class="fa-solid fa-rocket sticker sticker-1"></i>
+        <i class="fa-solid fa-headset sticker sticker-2"></i>
+        <i class="fa-solid fa-ticket sticker sticker-3"></i>
+        <i class="fa-solid fa-microchip sticker sticker-4"></i>
+        <i class="fa-solid fa-chart-pie sticker sticker-5"></i>
+        <i class="fa-solid fa-bolt sticker sticker-6"></i>
+        <i class="fa-solid fa-shield-halved sticker sticker-7"></i>
+    </div>
 
     <div class="sidebar" style="position: relative; z-index: 1;">
         <div class="logo">
             <div class="logo-icon">SP</div>
             SupportPilot
         </div>
-        <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
-        <a href="#" class="nav-item active"><i class="fa-solid fa-ticket"></i> Tickets</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-robot"></i> AI Agent</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-plug"></i> Integrations</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+        <a href="/dashboard" class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="/" class="nav-item active"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="/resolution" class="nav-item"><i class="fa-solid fa-lightbulb"></i> Resolution</a>
+        <a href="/agents" class="nav-item"><i class="fa-solid fa-robot"></i> AI Agent</a>
+        <a href="/integrations" class="nav-item"><i class="fa-solid fa-plug"></i> Integrations</a>
+        <a href="/analytics" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+        <a href="/settings" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+
+        <div style="flex-grow: 1;"></div>
+        <a href="#" class="nav-item" id="logoutBtn" style="color: var(--danger);"><i
+                class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
     </div>
 
     <div class="main-content">
@@ -447,14 +524,16 @@
                 <form id="ticketForm">
                     <div class="form-group">
                         <label class="form-label">Ticket Title</label>
-                        <input type="text" id="title" class="form-control" placeholder="Brief summary of the issue" required>
+                        <input type="text" id="title" class="form-control" placeholder="Brief summary of the issue"
+                            required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">Description</label>
-                        <textarea id="description" class="form-control" placeholder="Provide details about the issue..." required></textarea>
+                        <textarea id="description" class="form-control" placeholder="Provide details about the issue..."
+                            required></textarea>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">Requester Name</label>
                         <input type="text" id="employee_name" class="form-control" placeholder="John Doe">
@@ -464,7 +543,7 @@
                         <label class="form-label">Requester Email</label>
                         <input type="email" id="email" class="form-control" placeholder="john.doe@company.com">
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">Department</label>
                         <select id="department" class="form-control">
@@ -476,11 +555,11 @@
                             <option value="Production">Production</option>
                         </select>
                     </div>
-                    
+
                     <button type="submit" class="btn" id="submitBtn">
                         <i class="fa-solid fa-paper-plane"></i> Submit Ticket
                     </button>
-                    
+
                     <div class="loading" id="loadingIndicator">
                         <i class="fa-solid fa-circle-notch"></i> Processing with AI...
                     </div>
@@ -493,7 +572,7 @@
                     <div class="card-header">
                         <i class="fa-solid fa-robot"></i> AI Classification Results
                     </div>
-                    
+
                     <div class="stats-row">
                         <div class="stat-box">
                             <div class="stat-value" id="stat-accuracy">--%</div>
@@ -534,28 +613,29 @@
                     <div class="ticket-list" id="recentTickets">
                         <!-- Recent tickets rendered by server -->
                         {% for ticket in tickets %}
-                        <div class="ticket-item">
+                        <a href="/ticket/{{ ticket.id }}" class="ticket-item"
+                            style="text-decoration: none; color: inherit; display: flex;">
                             <div class="ticket-info">
                                 {% set icon_class = 'icon-system' %}
                                 {% set icon_name = 'fa-server' %}
-                                
+
                                 {% if ticket.category == 'Network' %}
-                                    {% set icon_class = 'icon-network' %}
-                                    {% set icon_name = 'fa-wifi' %}
+                                {% set icon_class = 'icon-network' %}
+                                {% set icon_name = 'fa-wifi' %}
                                 {% elif ticket.category == 'VPN' %}
-                                    {% set icon_class = 'icon-vpn' %}
-                                    {% set icon_name = 'fa-shield-halved' %}
+                                {% set icon_class = 'icon-vpn' %}
+                                {% set icon_name = 'fa-shield-halved' %}
                                 {% elif ticket.category == 'Software' %}
-                                    {% set icon_class = 'icon-software' %}
-                                    {% set icon_name = 'fa-laptop-code' %}
+                                {% set icon_class = 'icon-software' %}
+                                {% set icon_name = 'fa-laptop-code' %}
                                 {% elif ticket.category == 'Password' %}
-                                    {% set icon_class = 'icon-password' %}
-                                    {% set icon_name = 'fa-lock' %}
+                                {% set icon_class = 'icon-password' %}
+                                {% set icon_name = 'fa-lock' %}
                                 {% elif ticket.category == 'Hardware' %}
-                                    {% set icon_class = 'icon-hardware' %}
-                                    {% set icon_name = 'fa-desktop' %}
+                                {% set icon_class = 'icon-hardware' %}
+                                {% set icon_name = 'fa-desktop' %}
                                 {% endif %}
-                                
+
                                 <div class="ticket-icon {{ icon_class }}">
                                     <i class="fa-solid {{ icon_name }}"></i>
                                 </div>
@@ -565,9 +645,10 @@
                                 </div>
                             </div>
                             <div class="ticket-status">Classified</div>
-                        </div>
+                        </a>
                         {% else %}
-                        <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 10px;">No tickets submitted yet.</p>
+                        <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 10px;">No
+                            tickets submitted yet.</p>
                         {% endfor %}
                     </div>
                 </div>
@@ -578,11 +659,11 @@
     <script>
         document.getElementById('ticketForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const submitBtn = document.getElementById('submitBtn');
             const loadingIndicator = document.getElementById('loadingIndicator');
             const resultBox = document.getElementById('resultBox');
-            
+
             // Gather data
             const payload = {
                 title: document.getElementById('title').value,
@@ -591,63 +672,74 @@
                 email: document.getElementById('email').value,
                 department: document.getElementById('department').value
             };
-            
+
             // UI State - loading
             submitBtn.disabled = true;
             loadingIndicator.style.display = 'flex';
-            
+            resultBox.classList.remove('active');
+
             const startTime = performance.now();
-            
+
             try {
                 const response = await fetch('/ticket', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
+
                 const data = await response.json();
                 const endTime = performance.now();
                 const processingTime = ((endTime - startTime) / 1000).toFixed(2);
-                
+
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
                 if (response.ok) {
                     // Update Results UI
                     document.getElementById('res-ticket-id').textContent = `Ticket #T-${data.ticket_id.toString().padStart(4, '0')}`;
                     document.getElementById('res-category').textContent = data.category;
                     document.getElementById('res-severity').textContent = data.severity;
                     document.getElementById('res-priority').textContent = data.priority;
-                    
+
                     const badge = document.getElementById('res-priority-badge');
                     badge.textContent = `${data.priority} Priority`;
                     badge.className = `priority-badge ${data.priority.toLowerCase()}`;
-                    
+
                     document.getElementById('stat-accuracy').textContent = `${data.confidence}%`;
                     document.getElementById('stat-time').textContent = `${processingTime}s`;
-                    
+
                     const totalElem = document.getElementById('stat-total');
                     if (totalElem) {
                         totalElem.textContent = parseInt(totalElem.textContent || 0) + 1;
                     }
-                    
+
                     // Show result box
                     resultBox.classList.remove('active');
                     void resultBox.offsetWidth; // trigger reflow
                     resultBox.classList.add('active');
-                    
+
                     // Prepend to list
                     const list = document.getElementById('recentTickets');
-                    
+
                     // Determine icon based on category
                     let iconClass = 'icon-system';
                     let iconName = 'fa-server';
-                    
-                    if(data.category === 'Network') { iconClass = 'icon-network'; iconName = 'fa-wifi'; }
-                    else if(data.category === 'VPN') { iconClass = 'icon-vpn'; iconName = 'fa-shield-halved'; }
-                    else if(data.category === 'Software') { iconClass = 'icon-software'; iconName = 'fa-laptop-code'; }
-                    else if(data.category === 'Password') { iconClass = 'icon-password'; iconName = 'fa-lock'; }
-                    else if(data.category === 'Hardware') { iconClass = 'icon-hardware'; iconName = 'fa-desktop'; }
-                    
-                    const newItem = document.createElement('div');
+
+                    if (data.category === 'Network') { iconClass = 'icon-network'; iconName = 'fa-wifi'; }
+                    else if (data.category === 'VPN') { iconClass = 'icon-vpn'; iconName = 'fa-shield-halved'; }
+                    else if (data.category === 'Software') { iconClass = 'icon-software'; iconName = 'fa-laptop-code'; }
+                    else if (data.category === 'Password') { iconClass = 'icon-password'; iconName = 'fa-lock'; }
+                    else if (data.category === 'Hardware') { iconClass = 'icon-hardware'; iconName = 'fa-desktop'; }
+
+                    const newItem = document.createElement('a');
+                    const tId = data.ticket_id || data.id || '';
+                    newItem.href = `/ticket/${tId}`;
                     newItem.className = 'ticket-item';
+                    newItem.style.textDecoration = 'none';
+                    newItem.style.color = 'inherit';
+                    newItem.style.display = 'flex';
                     newItem.innerHTML = `
                         <div class="ticket-info">
                             <div class="ticket-icon ${iconClass}">
@@ -660,21 +752,26 @@
                         </div>
                         <div class="ticket-status">Classified</div>
                     `;
-                    
+
                     // Remove "No tickets" message if present
-                    if(list.children.length === 1 && list.children[0].tagName === 'P') {
+                    if (list.children.length === 1 && list.children[0].tagName === 'P') {
                         list.innerHTML = '';
                     }
-                    
+
                     list.insertBefore(newItem, list.firstChild);
-                    
+
                     // Keep list at 5 items
-                    if(list.children.length > 5) {
+                    if (list.children.length > 5) {
                         list.removeChild(list.lastChild);
                     }
-                    
+
                     // Reset form
                     document.getElementById('ticketForm').reset();
+                    
+                    // Add automatic transition to Milestone 2 (Resolution Generation) page
+                    setTimeout(() => {
+                        window.location.href = `/ticket/${data.ticket_id}`;
+                    }, 3000);
                 } else {
                     alert('Error submitting ticket: ' + (data.error || 'Unknown error'));
                 }
@@ -687,6 +784,17 @@
                 loadingIndicator.style.display = 'none';
             }
         });
+
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+            } catch (err) {
+                console.error(err);
+            }
+            window.location.href = '/login';
+        });
     </script>
 </body>
+
 </html>

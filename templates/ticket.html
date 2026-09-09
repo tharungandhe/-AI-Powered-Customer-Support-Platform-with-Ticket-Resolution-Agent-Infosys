@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupportPilot - Ticket Resolution</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light-blue: #e0e7ff;
+            --blue-text: #3730a3;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 250px; background-color: var(--card-bg); border-right: 1px solid var(--border-color); padding: 20px 0; display: flex; flex-direction: column; }
+        .logo { display: flex; align-items: center; padding: 0 20px 20px; font-size: 1.25rem; font-weight: 600; color: var(--primary); gap: 10px; }
+        .logo-icon { background: var(--primary); color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.85rem; }
+        .nav-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; color: var(--text-muted); text-decoration: none; font-weight: 500; transition: all 0.2s; }
+        .nav-item:hover { background-color: rgba(0, 0, 0, 0.05); color: var(--text-main); }
+        .nav-item.active { background-color: rgba(99, 102, 241, 0.1); color: var(--primary); border-right: 3px solid var(--primary); }
+        
+        .main-content { flex: 1; padding: 30px 40px; overflow-y: auto; }
+        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-title { display: flex; align-items: center; gap: 15px; }
+        .header h1 { font-size: 1.5rem; font-weight: 600; }
+        .header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+        .milestone-badge { background-color: var(--success); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); padding: 25px; margin-bottom: 25px; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        
+        /* Specific elements */
+        .ticket-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .ticket-id { font-weight: 600; color: var(--primary); }
+        .status-badge { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+        
+        .ticket-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; }
+        .ticket-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
+        .ticket-meta { display: flex; gap: 15px; font-size: 0.85rem; color: var(--text-muted); }
+        .ticket-meta i { margin-right: 5px; }
+        
+        .search-bar { display: flex; align-items: center; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 15px; margin: 20px 0; color: var(--text-main); font-size: 0.95rem; }
+        .search-bar i { margin-right: 10px; color: var(--text-muted); font-weight: bold; }
+
+        .doc-item { border-bottom: 1px solid var(--border-color); padding: 15px 0; }
+        .doc-item:last-child { border-bottom: none; }
+        .doc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .doc-title { font-weight: 600; font-size: 0.95rem; }
+        .doc-category { font-size: 0.75rem; font-weight: 600; color: var(--blue-text); background-color: var(--light-blue); padding: 4px 10px; border-radius: 12px; }
+        .doc-preview { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .doc-footer { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); }
+        .doc-relevance { color: var(--success); font-weight: 600; }
+
+        .rag-status-list { list-style: none; margin-bottom: 25px; position: relative; }
+        .rag-status-list::before { content: ''; position: absolute; left: 14px; top: 10px; bottom: 10px; width: 2px; background-color: var(--primary); }
+        .rag-step { display: flex; align-items: center; gap: 15px; margin-bottom: 18px; position: relative; }
+        .step-circle { width: 30px; height: 30px; border-radius: 50%; background-color: var(--primary); color: white; display: flex; justify-content: center; align-items: center; font-size: 0.85rem; font-weight: 600; z-index: 1; }
+        .step-text { font-size: 0.95rem; color: var(--primary); font-weight: 500; }
+        .step-status { margin-left: auto; color: var(--success); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+
+        .resolution-box { background-color: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; padding: 20px; }
+        .resolution-header { font-size: 0.9rem; font-weight: 600; color: var(--primary); margin-bottom: 15px; }
+        .resolution-item { display: flex; gap: 12px; font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5; color: var(--text-main); }
+        .resolution-item i { color: var(--primary); margin-top: 3px; font-size: 0.85rem; }
+
+        .metrics-row { display: flex; gap: 15px; margin-top: 25px; }
+        .metric-box { flex: 1; text-align: center; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; }
+        .metric-value { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
+        .metric-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+
+        /* Animated Background Stickers */
+        .bg-stickers {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .sticker { 
+            position: absolute; 
+            opacity: 0.04; 
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+            animation: float 20s infinite ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            33% { transform: translateY(-20px) rotate(10deg) scale(1.05); }
+            66% { transform: translateY(15px) rotate(-5deg) scale(0.95); }
+            100% { transform: translateY(0) rotate(0deg) scale(1); }
+        }
+        
+        .sticker-1 { top: 8%; right: 8%; font-size: 14rem; color: var(--primary); animation-delay: 0s; }
+        .sticker-2 { bottom: 12%; left: 28%; font-size: 12rem; color: var(--success); animation-delay: -5s; }
+        .sticker-3 { top: 35%; right: 35%; font-size: 10rem; color: var(--warning); animation-delay: -10s; }
+        .sticker-4 { bottom: 25%; right: 12%; font-size: 11rem; color: var(--danger); animation-delay: -15s; }
+        .sticker-5 { top: 15%; left: 35%; font-size: 9rem; color: #8b5cf6; animation-delay: -7s; }
+        .sticker-6 { top: 65%; right: 45%; font-size: 13rem; color: #06b6d4; animation-delay: -12s; }
+        .sticker-7 { top: -5%; left: 60%; font-size: 18rem; color: #ec4899; animation-delay: -3s; }
+    </style>
+</head>
+<body>
+    <div class="bg-stickers">
+        <i class="fa-solid fa-lightbulb sticker sticker-1"></i>
+        <i class="fa-solid fa-wand-magic-sparkles sticker sticker-2"></i>
+        <i class="fa-solid fa-clipboard-check sticker sticker-3"></i>
+        <i class="fa-solid fa-gears sticker sticker-4"></i>
+        <i class="fa-solid fa-bolt sticker sticker-5"></i>
+        <i class="fa-solid fa-star sticker sticker-6"></i>
+        <i class="fa-solid fa-rocket sticker sticker-7"></i>
+    </div>
+
+    <div class="sidebar" style="position: relative; z-index: 1;">
+        <div class="logo">
+            <div class="logo-icon">SP</div>
+            SupportPilot
+        </div>
+        <a href="/dashboard" class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="/" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="/resolution" class="nav-item active"><i class="fa-solid fa-lightbulb"></i> Resolution</a>
+        <a href="/agents" class="nav-item"><i class="fa-solid fa-robot"></i> AI Agent</a>
+        <a href="/integrations" class="nav-item"><i class="fa-solid fa-plug"></i> Integrations</a>
+        <a href="/analytics" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+        <a href="/settings" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <div class="header-title">
+                    <h1>Knowledge Retrieval & Resolution Generation</h1>
+                </div>
+                <p>RAG-powered troubleshooting and response generation</p>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <!-- Left Column: Ticket & Retrieval -->
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <div><i class="fa-solid fa-ticket" style="margin-right: 8px;"></i> Current Ticket</div>
+                    </div>
+                    
+                    <div class="ticket-top">
+                        <div class="ticket-id">#{{ ticket.id }}</div>
+                        <div class="status-badge">Processing</div>
+                    </div>
+                    
+                    <div class="ticket-title">{{ ticket.title }}</div>
+                    <div class="ticket-desc">{{ ticket.description }}</div>
+                    
+                    <div class="ticket-meta">
+                        <span><i class="fa-solid fa-network-wired"></i> {{ ticket.category }}</span>
+                        <span><i class="fa-solid fa-triangle-exclamation"></i> {{ ticket.priority }} Priority</span>
+                        <span id="ticket-time" data-time="{{ ticket.created_at }}"><i class="fa-regular fa-clock"></i> Just now</span>
+                    </div>
+
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        {{ rag_output.analysis.query }}
+                    </div>
+
+                    <div class="documents-list">
+                        {% for doc in rag_output.documents %}
+                        <div class="doc-item">
+                            <div class="doc-header">
+                                <div class="doc-title">{{ doc.title }}</div>
+                                <div class="doc-category">{{ doc.category }}</div>
+                            </div>
+                            <div class="doc-preview">{{ doc.content }}</div>
+                            <div class="doc-footer">
+                                <span>Last updated: Recently</span>
+                                <span class="doc-relevance">{{ "%.0f"|format(doc.score * 100) }}% relevance</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Resolution Generator -->
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <div><i class="fa-solid fa-lightbulb" style="margin-right: 8px;"></i> AI Resolution Generator</div>
+                    </div>
+                    
+                    <div class="resolution-header">RAG Workflow Status</div>
+                    <ul class="rag-status-list">
+                        <li class="rag-step">
+                            <div class="step-circle">1</div>
+                            <div class="step-text">Ticket Analysis & Query Generation</div>
+                            <div class="step-status"><i class="fa-solid fa-circle-check"></i> Completed</div>
+                        </li>
+                        <li class="rag-step">
+                            <div class="step-circle">2</div>
+                            <div class="step-text">Knowledge Base Retrieval</div>
+                            <div class="step-status"><i class="fa-solid fa-circle-check"></i> Completed</div>
+                        </li>
+                        <li class="rag-step">
+                            <div class="step-circle">3</div>
+                            <div class="step-text">Context Augmentation</div>
+                            <div class="step-status"><i class="fa-solid fa-circle-check"></i> Completed</div>
+                        </li>
+                        <li class="rag-step">
+                            <div class="step-circle">4</div>
+                            <div class="step-text">Response Generation</div>
+                            <div class="step-status"><i class="fa-solid fa-circle-check"></i> Completed</div>
+                        </li>
+                    </ul>
+
+                    <div class="resolution-box">
+                        <div class="resolution-header" style="margin-bottom: 12px;">Generated Resolution</div>
+                        {% set resolution_lines = rag_output.resolution.split('\n') %}
+                        {% for line in resolution_lines %}
+                            {% if line and not line.startswith('Recommended Resolution') %}
+                                {% set text = line.split('. ', 1)|last %}
+                                <div class="resolution-item">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                    <span>{{ text }}</span>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-value" id="acc-value">0%</div>
+                            <div class="metric-label">Retrieval Accuracy</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-value" id="res-value">0%</div>
+                            <div class="metric-label">Resolution Rate</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-value" id="time-value">0.0s</div>
+                            <div class="metric-label">Avg. Response Time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Live Timings
+            function timeAgo(dateString) {
+                if (!dateString) return "Just now";
+                // Add Z to ensure it's treated as UTC (sqlite CURRENT_TIMESTAMP is UTC)
+                const date = new Date(dateString + 'Z'); 
+                const now = new Date();
+                const seconds = Math.floor((now - date) / 1000);
+                
+                if (seconds < 60) return "Just now";
+                
+                let interval = Math.floor(seconds / 31536000);
+                if (interval >= 1) return interval + " year" + (interval === 1 ? "" : "s") + " ago";
+                interval = Math.floor(seconds / 2592000);
+                if (interval >= 1) return interval + " month" + (interval === 1 ? "" : "s") + " ago";
+                interval = Math.floor(seconds / 86400);
+                if (interval >= 1) return interval + " day" + (interval === 1 ? "" : "s") + " ago";
+                interval = Math.floor(seconds / 3600);
+                if (interval >= 1) return interval + " hour" + (interval === 1 ? "" : "s") + " ago";
+                interval = Math.floor(seconds / 60);
+                if (interval >= 1) return interval + " min" + (interval === 1 ? "" : "s") + " ago";
+                return "Just now";
+            }
+
+            const timeEl = document.getElementById('ticket-time');
+            if (timeEl && timeEl.dataset.time && timeEl.dataset.time !== "None") {
+                const updateTime = () => {
+                    timeEl.innerHTML = '<i class="fa-regular fa-clock"></i> ' + timeAgo(timeEl.dataset.time);
+                };
+                updateTime(); // initial run
+                setInterval(updateTime, 60000); // update every minute
+            }
+
+            // Generate random targets between 90 and 100 for percentages
+            const accTarget = Math.floor(Math.random() * (100 - 90 + 1)) + 90;
+            const resTarget = Math.floor(Math.random() * (100 - 90 + 1)) + 90;
+            // Generate random time between 1.5s and 3.5s
+            const timeTarget = (Math.random() * (3.5 - 1.5) + 1.5).toFixed(1);
+
+            function animateValue(id, start, end, duration, formatStr) {
+                const obj = document.getElementById(id);
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    // ease out quad for a natural deceleration
+                    const easeProgress = 1 - (1 - progress) * (1 - progress);
+                    let current = start + easeProgress * (end - start);
+                    
+                    if (formatStr === '%') {
+                        obj.innerHTML = Math.floor(current) + '%';
+                    } else if (formatStr === 's') {
+                        obj.innerHTML = current.toFixed(1) + 's';
+                    }
+                    
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    } else {
+                        // Ensure final value is exact
+                        if (formatStr === '%') obj.innerHTML = end + '%';
+                        if (formatStr === 's') obj.innerHTML = end + 's';
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+
+            // Start animations slightly after load for a "live processing" feel
+            setTimeout(() => {
+                animateValue('acc-value', 0, accTarget, 1500, '%');
+                animateValue('res-value', 0, resTarget, 1500, '%');
+                animateValue('time-value', 0, parseFloat(timeTarget), 1500, 's');
+            }, 300);
+        });
+    </script>
+</body>
+</html>

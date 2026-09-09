@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupportPilot - AI Agents</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar - standard */
+        .sidebar {
+            width: 250px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo { display: flex; align-items: center; padding: 0 20px 20px; font-size: 1.25rem; font-weight: 600; color: var(--primary); gap: 10px; }
+        .logo-icon { background: var(--primary); color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.85rem; }
+        .nav-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; color: var(--text-muted); text-decoration: none; font-weight: 500; transition: all 0.2s; }
+        .nav-item:hover { background-color: rgba(0, 0, 0, 0.05); color: var(--text-main); }
+        .nav-item.active { background-color: rgba(99, 102, 241, 0.1); color: var(--primary); border-right: 3px solid var(--primary); }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px 50px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Ambient Glow behind content */
+        .ambient-glow {
+            position: fixed;
+            top: 20%;
+            right: 10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .header {
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        .header h1 { font-size: 2rem; font-weight: 700; background: linear-gradient(90deg, var(--text-main), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-muted); font-size: 1.05rem; margin-top: 5px; font-weight: 400; }
+
+        .agents-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Glassmorphic Horizontal Cards */
+        .agent-row {
+            display: flex;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .agent-row:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Colored accent line */
+        .agent-row::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 6px;
+            background: var(--primary);
+        }
+
+        .row-triage::before { background: linear-gradient(180deg, var(--primary), var(--accent-cyan)); }
+        .row-rag::before { background: linear-gradient(180deg, var(--success), var(--primary)); }
+        .row-bot::before { background: linear-gradient(180deg, var(--warning), var(--danger)); }
+
+        .agent-info {
+            flex: 2;
+            padding-right: 30px;
+            border-right: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .agent-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .agent-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: white;
+        }
+
+        .icon-triage { background: linear-gradient(135deg, var(--primary), var(--accent-cyan)); }
+        .icon-rag { background: linear-gradient(135deg, var(--success), #34d399); }
+        .icon-bot { background: linear-gradient(135deg, var(--warning), #fbbf24); }
+
+        .agent-name { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
+        .agent-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .pulse-ring {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .pulse-active { background-color: var(--success); }
+        .pulse-active::after {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border-radius: 50%;
+            border: 2px solid var(--success);
+            animation: pulse-animation 2s infinite;
+        }
+
+        .pulse-training { background-color: var(--warning); }
+        .pulse-training::after {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border-radius: 50%;
+            border: 2px solid var(--warning);
+            border-top-color: transparent;
+            animation: spin-animation 1s linear infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+        @keyframes spin-animation {
+            100% { transform: rotate(360deg); }
+        }
+
+        .agent-stats {
+            flex: 3;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 20px;
+        }
+
+        .stat-block {
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-val {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 5px;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .agent-controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+            padding-left: 30px;
+            border-left: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .btn-control {
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid transparent;
+        }
+
+        .btn-config { background: var(--text-main); color: white; }
+        .btn-config:hover { background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        
+        .btn-logs { background: transparent; border-color: var(--border-color); color: var(--text-main); }
+        .btn-logs:hover { background: var(--bg-color); }
+
+        /* Stickers CSS */
+        .sticker { position: fixed; z-index: 0; opacity: 0.05; pointer-events: none; }
+        .sticker-1 { top: 10%; right: 5%; font-size: 15rem; transform: rotate(-15deg); color: var(--primary); }
+        .sticker-2 { bottom: 10%; left: 22%; font-size: 12rem; transform: rotate(20deg); color: var(--success); }
+        .sticker-3 { top: 40%; right: 30%; font-size: 8rem; transform: rotate(10deg); color: var(--warning); }
+        .sticker-4 { bottom: 30%; right: 10%; font-size: 10rem; transform: rotate(-25deg); color: var(--danger); }
+    </style>
+</head>
+
+<body>
+    <i class="fa-solid fa-robot sticker sticker-1"></i>
+    <i class="fa-solid fa-brain sticker sticker-2"></i>
+    <i class="fa-solid fa-microchip sticker sticker-3"></i>
+    <i class="fa-solid fa-bolt sticker sticker-4"></i>
+    
+    <div class="ambient-glow"></div>
+
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">SP</div>
+            SupportPilot
+        </div>
+        <a href="/dashboard" class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="/" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="/resolution" class="nav-item"><i class="fa-solid fa-lightbulb"></i> Resolution</a>
+        <a href="/agents" class="nav-item active"><i class="fa-solid fa-robot"></i> AI Agent</a>
+        <a href="/integrations" class="nav-item"><i class="fa-solid fa-plug"></i> Integrations</a>
+        <a href="/analytics" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+        <a href="/settings" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+
+        <div style="flex-grow: 1;"></div>
+        <a href="#" class="nav-item" id="logoutBtn" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>AI Agents Command Center</h1>
+            <p>Live monitoring and configuration of your specialized intelligence models</p>
+        </div>
+
+        <div class="agents-container">
+            <!-- Triage Classifier -->
+            <div class="agent-row row-triage">
+                <div class="agent-info">
+                    <div class="agent-title-wrapper">
+                        <div class="agent-icon icon-triage"><i class="fa-solid fa-filter"></i></div>
+                        <div class="agent-name">Triage Classifier</div>
+                    </div>
+                    <div class="agent-desc">Automatically categorizes incoming tickets and assigns priority based on deep semantic understanding.</div>
+                    <div class="status-badge">
+                        <div class="pulse-ring pulse-active"></div>
+                        Operational
+                    </div>
+                </div>
+                
+                <div class="agent-stats">
+                    <div class="stat-block">
+                        <div class="stat-val live-data" data-target="{{ triage_acc }}">{{ triage_acc }}%</div>
+                        <div class="stat-label">Avg Confidence</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-val live-data" data-target="{{ triage_count }}">{{ triage_count }}</div>
+                        <div class="stat-label">Tickets Processed</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-val">0.3s</div>
+                        <div class="stat-label">Inference Latency</div>
+                    </div>
+                </div>
+
+                <div class="agent-controls">
+                    <button class="btn-control btn-config"><i class="fa-solid fa-sliders"></i> Tune Model</button>
+                    <button class="btn-control btn-logs"><i class="fa-solid fa-scroll"></i> View Logs</button>
+                </div>
+            </div>
+
+            <!-- RAG Resolution Engine -->
+            <div class="agent-row row-rag">
+                <div class="agent-info">
+                    <div class="agent-title-wrapper">
+                        <div class="agent-icon icon-rag"><i class="fa-solid fa-book-open-reader"></i></div>
+                        <div class="agent-name">RAG Resolution Engine</div>
+                    </div>
+                    <div class="agent-desc">Retrieves relevant knowledge base articles and generates contextual step-by-step resolutions for agents.</div>
+                    <div class="status-badge">
+                        <div class="pulse-ring pulse-active"></div>
+                        Operational
+                    </div>
+                </div>
+                
+                <div class="agent-stats">
+                    <div class="stat-block">
+                        <div class="stat-val">89.2%</div>
+                        <div class="stat-label">Helpful Rate</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-val live-data" data-target="{{ rag_generated }}">{{ rag_generated }}</div>
+                        <div class="stat-label">Resolutions Generated</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-val">1.2s</div>
+                        <div class="stat-label">Generation Latency</div>
+                    </div>
+                </div>
+
+                <div class="agent-controls">
+                    <button class="btn-control btn-config"><i class="fa-solid fa-database"></i> Edit Sources</button>
+                    <button class="btn-control btn-logs"><i class="fa-solid fa-scroll"></i> View Logs</button>
+                </div>
+            </div>
+
+            <!-- Customer Facing Bot -->
+            <div class="agent-row row-bot">
+                <div class="agent-info">
+                    <div class="agent-title-wrapper">
+                        <div class="agent-icon icon-bot"><i class="fa-solid fa-comments"></i></div>
+                        <div class="agent-name">Customer Facing Bot</div>
+                    </div>
+                    <div class="agent-desc">First-line conversational interface that helps users resolve simple queries instantly before ticket creation.</div>
+                    <div class="status-badge" style="color: var(--warning);">
+                        <div class="pulse-ring pulse-training"></div>
+                        Fine-tuning...
+                    </div>
+                </div>
+                
+                <div class="agent-stats" style="opacity: 0.5;">
+                    <div class="stat-block">
+                        <div class="stat-val">--%</div>
+                        <div class="stat-label">Deflection Rate</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-val">0</div>
+                        <div class="stat-label">Interactions</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-val">--</div>
+                        <div class="stat-label">CSAT Score</div>
+                    </div>
+                </div>
+
+                <div class="agent-controls">
+                    <button class="btn-control btn-config" disabled style="opacity: 0.5; cursor: not-allowed;"><i class="fa-solid fa-spinner fa-spin"></i> Deploying</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = '/login';
+        });
+
+        // Add a nice counting animation to the live numbers
+        document.addEventListener("DOMContentLoaded", () => {
+            const elements = document.querySelectorAll('.live-data');
+            
+            elements.forEach(el => {
+                const targetText = el.getAttribute('data-target');
+                if(!targetText) return;
+                
+                const isFloat = targetText.includes('.');
+                const targetNum = parseFloat(targetText);
+                
+                if(isNaN(targetNum) || targetNum === 0) return;
+                
+                let current = 0;
+                const duration = 1500; // ms
+                const stepTime = 20;
+                const steps = duration / stepTime;
+                const increment = targetNum / steps;
+                
+                const suffix = targetText.includes('%') ? '%' : '';
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if(current >= targetNum) {
+                        current = targetNum;
+                        clearInterval(timer);
+                    }
+                    
+                    if(isFloat) {
+                        el.innerText = current.toFixed(1) + suffix;
+                    } else {
+                        el.innerText = Math.floor(current) + suffix;
+                    }
+                }, stepTime);
+            });
+        });
+    </script>
+</body>
+
+</html>

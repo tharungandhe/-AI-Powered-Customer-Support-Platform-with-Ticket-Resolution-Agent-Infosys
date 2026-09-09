@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupportPilot - Integrations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            gap: 10px;
+        }
+
+        .logo-icon {
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border-right: 3px solid var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .integrations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .integration-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .platform-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .platform-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .platform-icon img {
+            max-width: 24px;
+            max-height: 24px;
+        }
+
+        .platform-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .platform-status {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .platform-status.connected {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* Toggle switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .integration-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .sync-info {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sync-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .sync-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* specific icon colors */
+        .icon-slack { background-color: #E01E5A; color: white; }
+        .icon-jira { background-color: #0052CC; color: white; }
+        .icon-salesforce { background-color: #00A1E0; color: white; }
+        .icon-zendesk { background-color: #03363D; color: #17494D; }
+
+        /* Stickers CSS */
+        .sticker { position: fixed; z-index: 0; opacity: 0.05; pointer-events: none; }
+        .sticker-1 { top: 10%; right: 5%; font-size: 15rem; transform: rotate(-15deg); color: var(--primary); }
+        .sticker-2 { bottom: 10%; left: 22%; font-size: 12rem; transform: rotate(20deg); color: var(--success); }
+        .sticker-3 { top: 40%; right: 30%; font-size: 8rem; transform: rotate(10deg); color: var(--warning); }
+        .sticker-4 { bottom: 30%; right: 10%; font-size: 10rem; transform: rotate(-25deg); color: var(--danger); }
+    </style>
+</head>
+
+<body>
+    <i class="fa-solid fa-plug sticker sticker-1"></i>
+    <i class="fa-solid fa-link sticker sticker-2"></i>
+    <i class="fa-solid fa-network-wired sticker sticker-3"></i>
+    <i class="fa-solid fa-cloud sticker sticker-4"></i>
+
+    <div class="sidebar" style="position: relative; z-index: 1;">
+        <div class="logo">
+            <div class="logo-icon">SP</div>
+            SupportPilot
+        </div>
+        <a href="/dashboard" class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="/" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="/resolution" class="nav-item"><i class="fa-solid fa-lightbulb"></i> Resolution</a>
+        <a href="/agents" class="nav-item"><i class="fa-solid fa-robot"></i> AI Agent</a>
+        <a href="/integrations" class="nav-item active"><i class="fa-solid fa-plug"></i> Integrations</a>
+        <a href="/analytics" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+        <a href="/settings" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+
+        <div style="flex-grow: 1;"></div>
+        <a href="#" class="nav-item" id="logoutBtn" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Integrations</h1>
+            <p>Connect SupportPilot with your existing tools and workflows</p>
+        </div>
+
+        <div class="integrations-grid">
+            <div class="integration-card">
+                <div class="card-top">
+                    <div class="platform-info">
+                        <div class="platform-icon icon-slack"><i class="fa-brands fa-slack"></i></div>
+                        <div>
+                            <div class="platform-name">Slack</div>
+                            <div class="platform-status connected"><i class="fa-solid fa-circle-check"></i> Connected</div>
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="integration-desc">
+                    Receive ticket notifications, create tickets directly from messages, and deploy the AI triage bot in designated channels.
+                </div>
+                <div class="sync-info">
+                    <span>Last synced: 2 mins ago</span>
+                    <button class="sync-btn"><i class="fa-solid fa-arrows-rotate"></i> Sync Now</button>
+                </div>
+            </div>
+
+            <div class="integration-card">
+                <div class="card-top">
+                    <div class="platform-info">
+                        <div class="platform-icon icon-jira"><i class="fa-brands fa-jira"></i></div>
+                        <div>
+                            <div class="platform-name">Jira Service Management</div>
+                            <div class="platform-status connected"><i class="fa-solid fa-circle-check"></i> Connected</div>
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="integration-desc">
+                    Bi-directional sync of tickets and issues. Automatically escalate high-severity tickets to engineering boards.
+                </div>
+                <div class="sync-info">
+                    <span>Last synced: 15 mins ago</span>
+                    <button class="sync-btn"><i class="fa-solid fa-arrows-rotate"></i> Sync Now</button>
+                </div>
+            </div>
+
+            <div class="integration-card">
+                <div class="card-top">
+                    <div class="platform-info">
+                        <div class="platform-icon icon-salesforce"><i class="fa-brands fa-salesforce"></i></div>
+                        <div>
+                            <div class="platform-name">Salesforce</div>
+                            <div class="platform-status">Not connected</div>
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="integration-desc">
+                    Link tickets to customer profiles. Display CRM context directly in the ticket resolution interface for agents.
+                </div>
+                <div class="sync-info">
+                    <span>Never synced</span>
+                    <button class="sync-btn" style="color: var(--text-muted);"><i class="fa-solid fa-link"></i> Connect</button>
+                </div>
+            </div>
+            
+            <div class="integration-card">
+                <div class="card-top">
+                    <div class="platform-info">
+                        <div class="platform-icon" style="background-color: #17494D; color: white;"><i class="fa-solid fa-z"></i></div>
+                        <div>
+                            <div class="platform-name">Zendesk</div>
+                            <div class="platform-status">Not connected</div>
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="integration-desc">
+                    Import historical ticket data to train SupportPilot models, or run as a side-car assistant in Zendesk UI.
+                </div>
+                <div class="sync-info">
+                    <span>Never synced</span>
+                    <button class="sync-btn" style="color: var(--text-muted);"><i class="fa-solid fa-link"></i> Connect</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = '/login';
+        });
+    </script>
+</body>
+
+</html>

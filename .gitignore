@@ -1,8 +1,41 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
-tickets.db
-models/*.pkl
-.env
-.venv/
+*.py[cod]
+*$py.class
+
+# Virtual environments
 venv/
+.venv/
 env/
+
+# Database files
+tickets.db
+instance/
+
+# Environment variables
+.env
+.flaskenv
+
+# Trained ML Models
+models/*.pkl
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing / Coverage
+.pytest_cache/
+htmlcov/
+.coverage
+.tox/

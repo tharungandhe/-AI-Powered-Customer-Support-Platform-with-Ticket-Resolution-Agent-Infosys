@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupportPilot - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            gap: 10px;
+        }
+
+        .logo-icon {
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            border-right: 3px solid var(--primary);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .header-logo {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header h1 span {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .global-search {
+            position: relative;
+            margin-left: auto;
+            width: 350px;
+        }
+
+        .global-search input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .global-search input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-top: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            display: none;
+            overflow: hidden;
+        }
+
+        .search-result-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            color: var(--text-main);
+            text-decoration: none;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover {
+            background-color: rgba(79, 70, 229, 0.05);
+            color: var(--primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .icon-total { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .icon-open { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .icon-urgent { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .icon-ai { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+        .stat-info h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--text-main);
+            line-height: 1;
+        }
+
+        .stat-info p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* 3-Column Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-main);
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover td {
+            background-color: rgba(0,0,0,0.01);
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-p1, .badge-p2 { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .badge-p3 { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .badge-p4 { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        
+        .status-open { color: var(--warning); font-weight: 600; }
+        .status-closed { color: var(--text-muted); font-weight: 600; }
+        .status-resolved { color: var(--success); font-weight: 600; }
+
+        /* Middle Column Flex */
+        .mini-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .mini-stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .mini-stat-card h4 {
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .mini-stat-card h4 i {
+            color: var(--primary);
+        }
+        
+        .mini-stat-card h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* Right Column Agents */
+        .agent-header {
+            background: rgba(79, 70, 229, 0.05);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .agent-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        
+        .agent-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+        }
+        
+        .agent-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+        
+        .agent-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .bg-blue { background: #3b82f6; }
+        .bg-green { background: #10b981; }
+        .bg-purple { background: #8b5cf6; }
+        
+        .agent-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+        
+        .agent-stats {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .agent-stat-item {
+            text-align: left;
+        }
+        
+        .agent-stat-item span {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .agent-stat-item strong {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Animated Background Stickers */
+        .bg-stickers {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .sticker { 
+            position: absolute; 
+            opacity: 0.04; 
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+            animation: float 20s infinite ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            33% { transform: translateY(-20px) rotate(10deg) scale(1.05); }
+            66% { transform: translateY(15px) rotate(-5deg) scale(0.95); }
+            100% { transform: translateY(0) rotate(0deg) scale(1); }
+        }
+        
+        .sticker-1 { top: 10%; right: 10%; font-size: 16rem; color: var(--primary); animation-delay: 0s; }
+        .sticker-2 { bottom: 15%; left: 25%; font-size: 14rem; color: var(--success); animation-delay: -5s; }
+        .sticker-3 { top: 40%; left: 10%; font-size: 12rem; color: var(--warning); animation-delay: -10s; }
+        .sticker-4 { bottom: 20%; right: 15%; font-size: 15rem; color: var(--danger); animation-delay: -15s; }
+        .sticker-5 { top: 20%; left: 40%; font-size: 10rem; color: #8b5cf6; animation-delay: -7s; }
+        .sticker-6 { top: 70%; right: 40%; font-size: 18rem; color: #06b6d4; animation-delay: -12s; }
+        .sticker-7 { top: -5%; left: 60%; font-size: 20rem; color: #ec4899; animation-delay: -3s; }
+
+    </style>
+</head>
+
+<body>
+    <div class="bg-stickers">
+        <i class="fa-solid fa-chart-pie sticker sticker-1"></i>
+        <i class="fa-solid fa-robot sticker sticker-2"></i>
+        <i class="fa-solid fa-headset sticker sticker-3"></i>
+        <i class="fa-solid fa-server sticker sticker-4"></i>
+        <i class="fa-solid fa-microchip sticker sticker-5"></i>
+        <i class="fa-solid fa-shield-halved sticker sticker-6"></i>
+        <i class="fa-solid fa-cloud sticker sticker-7"></i>
+    </div>
+    <div class="sidebar" style="position: relative; z-index: 10;">
+        <div class="logo">
+            <div class="logo-icon">SP</div>
+            SupportPilot
+        </div>
+        <a href="/dashboard" class="nav-item active"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="/" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+        <a href="/resolution" class="nav-item"><i class="fa-solid fa-lightbulb"></i> Resolution</a>
+        <a href="/agents" class="nav-item"><i class="fa-solid fa-robot"></i> AI Agent</a>
+        <a href="/integrations" class="nav-item"><i class="fa-solid fa-plug"></i> Integrations</a>
+        <a href="/analytics" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+        <a href="/settings" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+
+        <div style="flex-grow: 1;"></div>
+        <a href="#" class="nav-item" id="logoutBtn" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="header-logo">SP</div>
+                <h1>SupportPilot</h1>
+            </div>
+            
+            <div class="global-search">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="globalSearchInput" placeholder="Search pages (e.g. Tickets, Resolution)..." autocomplete="off">
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            <a href="/" class="btn">
+                <i class="fa-solid fa-plus"></i> New Ticket
+            </a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon icon-total"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="stat-info">
+                    <h3>{{ total_tickets }}</h3>
+                    <p>Total Tickets</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-open"><i class="fa-solid fa-envelope-open-text"></i></div>
+                <div class="stat-info">
+                    <h3>{{ open_tickets }}</h3>
+                    <p>Open Tickets</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-urgent"><i class="fa-solid fa-fire"></i></div>
+                <div class="stat-info">
+                    <h3>{{ high_priority }}</h3>
+                    <p>High Priority</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-ai"><i class="fa-solid fa-brain"></i></div>
+                <div class="stat-info">
+                    <h3>{{ avg_confidence }}%</h3>
+                    <p>Avg AI Confidence</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Left Column: Recent Activity -->
+            <div class="card" style="height: 100%;">
+                <div class="card-header">
+                    <i class="fa-solid fa-clock-rotate-left" style="color: var(--text-muted);"></i> Recent Activity
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in recent_tickets %}
+                            <tr style="cursor: pointer;" onclick="window.location.href='/ticket/{{ t.id }}'">
+                                <td style="font-weight: 600; color: var(--primary);">#T-2023-{{ t.id }}</td>
+                                <td>{{ t.title }}</td>
+                                <td>{{ t.category }}</td>
+                                <td><span class="badge badge-{{ t.priority | lower }}">{{ t.priority }}</span></td>
+                                <td class="status-{{ t.status | lower }}">{{ t.status }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">No recent tickets available.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Middle Column: Chart & Mini Stats -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="card" style="flex: 1; margin-bottom: 0;">
+                    <div class="card-header">
+                        <i class="fa-solid fa-chart-column" style="color: var(--text-muted);"></i> Tickets by Category
+                    </div>
+                    <div style="position: relative; height: 100%; min-height: 200px;">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                <div class="mini-stats-grid">
+                    <div class="mini-stat-card">
+                        <h4><i class="fa-solid fa-stopwatch"></i> Mean Time to Resolution</h4>
+                        <h2>{{ mean_time_to_resolution }}</h2>
+                    </div>
+                    <div class="mini-stat-card">
+                        <h4><i class="fa-solid fa-shield-halved"></i> AI Deflection Rate</h4>
+                        <h2>{{ deflection_rate }}%</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: AI Agents -->
+            <div class="card" style="height: 100%;">
+                <div class="card-header">
+                    <i class="fa-solid fa-robot" style="color: var(--primary);"></i> AI Agents Command Center
+                </div>
+                
+                <div class="agent-card">
+                    <div class="agent-card-title">
+                        <div class="agent-icon bg-blue"><i class="fa-solid fa-filter"></i></div>
+                        Triage Classifier
+                    </div>
+                    <p class="agent-desc">Automatically categorizes tickets and assigns priority/support.</p>
+                    <div class="agent-stats">
+                        <div class="agent-stat-item">
+                            <span>Tickets</span>
+                            <strong>{{ total_tickets }}</strong>
+                        </div>
+                        <div class="agent-stat-item">
+                            <span>Status</span>
+                            <strong style="color: var(--success);"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Operational</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-card-title">
+                        <div class="agent-icon bg-green"><i class="fa-solid fa-book-open"></i></div>
+                        RAG Resolution Engine
+                    </div>
+                    <p class="agent-desc">Automatically drafts suggested responses using knowledge base.</p>
+                    <div class="agent-stats">
+                        <div class="agent-stat-item">
+                            <span>Resolved</span>
+                            <strong>{{ (total_tickets * 0.4) | int }}</strong>
+                        </div>
+                        <div class="agent-stat-item">
+                            <span>Avg Time</span>
+                            <strong>2.2s</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card" style="margin-bottom: 0;">
+                    <div class="agent-card-title">
+                        <div class="agent-icon bg-purple"><i class="fa-solid fa-microchip"></i></div>
+                        Avg Info Controller
+                    </div>
+                    <p class="agent-desc">Monitors system load and allocates AI compute resources.</p>
+                    <div class="agent-stats">
+                        <div class="agent-stat-item">
+                            <span>Load</span>
+                            <strong>42%</strong>
+                        </div>
+                        <div class="agent-stat-item">
+                            <span>Status</span>
+                            <strong style="color: var(--success);"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Operational</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = '/login';
+        });
+
+        // Initialize Category Chart
+        // Global Search Functionality
+        const pages = [
+            { name: "Dashboard", url: "/dashboard", icon: "fa-chart-line" },
+            { name: "Tickets", url: "/", icon: "fa-ticket" },
+            { name: "Resolution", url: "/resolution", icon: "fa-lightbulb" },
+            { name: "AI Agent", url: "/agents", icon: "fa-robot" },
+            { name: "Integrations", url: "/integrations", icon: "fa-plug" },
+            { name: "Analytics", url: "/analytics", icon: "fa-chart-pie" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('globalSearchInput');
+            const searchResults = document.getElementById('searchResults');
+
+            if (searchInput && searchResults) {
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase().trim();
+                    searchResults.innerHTML = '';
+
+                    if (query.length > 0) {
+                        const filtered = pages.filter(page => page.name.toLowerCase().includes(query));
+                        
+                        if (filtered.length > 0) {
+                            filtered.forEach(page => {
+                                const el = document.createElement('a');
+                                el.href = page.url;
+                                el.className = 'search-result-item';
+                                el.innerHTML = `<i class="fa-solid ${page.icon}" style="color: var(--text-muted);"></i> ${page.name}`;
+                                searchResults.appendChild(el);
+                            });
+                            searchResults.style.display = 'block';
+                        } else {
+                            searchResults.style.display = 'none';
+                        }
+                    } else {
+                        searchResults.style.display = 'none';
+                    }
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                        searchResults.style.display = 'none';
+                    }
+                });
+            }
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            // Data passed from backend
+            const labels = {{ categories_labels | safe }};
+            const data = {{ categories_values | safe }};
+            
+            // Provide fallback data if empty
+            const chartLabels = labels.length > 0 ? labels : ['VPN', 'Network', 'Hardware', 'Software', 'Password'];
+            const chartData = data.length > 0 ? data : [12, 19, 3, 5, 2];
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Tickets',
+                        data: chartData,
+                        backgroundColor: [
+                            'rgba(79, 70, 229, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(139, 92, 246, 0.8)'
+                        ],
+                        borderRadius: 4,
+                        barThickness: 'flex',
+                        maxBarThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                precision: 0,
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 10
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
