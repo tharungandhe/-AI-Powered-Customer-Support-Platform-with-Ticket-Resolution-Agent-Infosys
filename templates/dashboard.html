@@ -560,28 +560,28 @@
             <div class="stat-card">
                 <div class="stat-icon icon-total"><i class="fa-solid fa-layer-group"></i></div>
                 <div class="stat-info">
-                    <h3>{{ total_tickets }}</h3>
+                    <h3 id="stat-total-tickets">{{ total_tickets }}</h3>
                     <p>Total Tickets</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon icon-open"><i class="fa-solid fa-envelope-open-text"></i></div>
                 <div class="stat-info">
-                    <h3>{{ open_tickets }}</h3>
+                    <h3 id="stat-open-tickets">{{ open_tickets }}</h3>
                     <p>Open Tickets</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon icon-urgent"><i class="fa-solid fa-fire"></i></div>
                 <div class="stat-info">
-                    <h3>{{ high_priority }}</h3>
+                    <h3 id="stat-high-priority">{{ high_priority }}</h3>
                     <p>High Priority</p>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon icon-ai"><i class="fa-solid fa-brain"></i></div>
                 <div class="stat-info">
-                    <h3>{{ avg_confidence }}%</h3>
+                    <h3 id="stat-avg-confidence">{{ avg_confidence }}%</h3>
                     <p>Avg AI Confidence</p>
                 </div>
             </div>
@@ -604,7 +604,7 @@
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="recent-tickets-tbody">
                             {% for t in recent_tickets %}
                             <tr style="cursor: pointer;" onclick="window.location.href='/ticket/{{ t.id }}'">
                                 <td style="font-weight: 600; color: var(--primary);">#T-2023-{{ t.id }}</td>
@@ -640,7 +640,7 @@
                     </div>
                     <div class="mini-stat-card">
                         <h4><i class="fa-solid fa-shield-halved"></i> AI Deflection Rate</h4>
-                        <h2>{{ deflection_rate }}%</h2>
+                        <h2 id="stat-deflection-rate">{{ deflection_rate }}%</h2>
                     </div>
                 </div>
             </div>
@@ -651,56 +651,22 @@
                     <i class="fa-solid fa-robot" style="color: var(--primary);"></i> AI Agents Command Center
                 </div>
                 
-                <div class="agent-card">
-                    <div class="agent-card-title">
-                        <div class="agent-icon bg-blue"><i class="fa-solid fa-filter"></i></div>
-                        Triage Classifier
-                    </div>
-                    <p class="agent-desc">Automatically categorizes tickets and assigns priority/support.</p>
-                    <div class="agent-stats">
-                        <div class="agent-stat-item">
-                            <span>Tickets</span>
-                            <strong>{{ total_tickets }}</strong>
-                        </div>
-                        <div class="agent-stat-item">
-                            <span>Status</span>
-                            <strong style="color: var(--success);"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Operational</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="agent-card">
-                    <div class="agent-card-title">
-                        <div class="agent-icon bg-green"><i class="fa-solid fa-book-open"></i></div>
-                        RAG Resolution Engine
-                    </div>
-                    <p class="agent-desc">Automatically drafts suggested responses using knowledge base.</p>
-                    <div class="agent-stats">
-                        <div class="agent-stat-item">
-                            <span>Resolved</span>
-                            <strong>{{ (total_tickets * 0.4) | int }}</strong>
-                        </div>
-                        <div class="agent-stat-item">
-                            <span>Avg Time</span>
-                            <strong>2.2s</strong>
-                        </div>
-                    </div>
-                </div>
+                
 
                 <div class="agent-card" style="margin-bottom: 0;">
                     <div class="agent-card-title">
-                        <div class="agent-icon bg-purple"><i class="fa-solid fa-microchip"></i></div>
-                        Avg Info Controller
+                        <div class="agent-icon" style="background: #0052CC;"><i class="fa-brands fa-jira"></i></div>
+                        Jira Integration
                     </div>
-                    <p class="agent-desc">Monitors system load and allocates AI compute resources.</p>
+                    <p class="agent-desc">Automatically tracks all support requests as Jira tickets.</p>
                     <div class="agent-stats">
                         <div class="agent-stat-item">
-                            <span>Load</span>
-                            <strong>42%</strong>
+                            <span>Jira Tickets</span>
+                            <strong>{{ jira_tickets }}</strong>
                         </div>
                         <div class="agent-stat-item">
-                            <span>Status</span>
-                            <strong style="color: var(--success);"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Operational</strong>
+                            <span>History</span>
+                            <strong><a href="/integrations" style="text-decoration: none; color: var(--primary);">View <i class="fa-solid fa-arrow-right"></i></a></strong>
                         </div>
                     </div>
                 </div>
@@ -771,7 +737,7 @@
             const chartLabels = labels.length > 0 ? labels : ['VPN', 'Network', 'Hardware', 'Software', 'Password'];
             const chartData = data.length > 0 ? data : [12, 19, 3, 5, 2];
 
-            new Chart(ctx, {
+            window.categoryChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: chartLabels,
@@ -828,6 +794,44 @@
                     }
                 }
             });
+
+            // Poll for real-time updates every 3 seconds
+            setInterval(() => {
+                fetch('/api/dashboard/stats')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('stat-total-tickets').innerText = data.total_tickets;
+                        document.getElementById('stat-open-tickets').innerText = data.open_tickets;
+                        document.getElementById('stat-high-priority').innerText = data.high_priority;
+                        document.getElementById('stat-avg-confidence').innerText = data.avg_confidence + '%';
+                        document.getElementById('stat-deflection-rate').innerText = data.deflection_rate + '%';
+                        document.getElementById('stat-agent-total-tickets').innerText = data.total_tickets;
+                        document.getElementById('stat-agent-resolved-tickets').innerText = Math.floor(data.total_tickets * 0.4);
+
+                        const tbody = document.getElementById('recent-tickets-tbody');
+                        if (data.recent_tickets && data.recent_tickets.length > 0) {
+                            let html = '';
+                            data.recent_tickets.forEach(t => {
+                                html += `
+                                <tr style="cursor: pointer;" onclick="window.location.href='/ticket/${t.id}'">
+                                    <td style="font-weight: 600; color: var(--primary);">#T-2023-${t.id}</td>
+                                    <td>${t.title}</td>
+                                    <td>${t.category}</td>
+                                    <td><span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span></td>
+                                    <td class="status-${t.status.toLowerCase()}">${t.status}</td>
+                                </tr>`;
+                            });
+                            tbody.innerHTML = html;
+                        }
+
+                        if(window.categoryChartInstance && data.categories_labels.length > 0) {
+                            window.categoryChartInstance.data.labels = data.categories_labels;
+                            window.categoryChartInstance.data.datasets[0].data = data.categories_values;
+                            window.categoryChartInstance.update();
+                        }
+                    })
+                    .catch(err => console.error('Error fetching real-time stats:', err));
+            }, 3000);
         });
     </script>
 </body>

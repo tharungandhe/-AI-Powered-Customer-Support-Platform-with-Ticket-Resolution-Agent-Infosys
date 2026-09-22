@@ -1,288 +1,411 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SupportPilot - AI Agents</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>SupportPilot - AI Agent</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
             --primary: #4f46e5;
             --primary-hover: #4338ca;
-            --bg-color: #f8fafc;
+            --bg: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --border-color: #e2e8f0;
+            --border: #e2e8f0;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --accent-purple: #8b5cf6;
-            --accent-cyan: #06b6d4;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
             color: var(--text-main);
+            margin: 0;
             display: flex;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* Sidebar - standard */
+        /* Sidebar */
         .sidebar {
             width: 250px;
             background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
+            border-right: 1px solid var(--border);
             padding: 20px 0;
             display: flex;
             flex-direction: column;
-            position: relative;
-            z-index: 10;
+            flex-shrink: 0;
         }
-
-        .logo { display: flex; align-items: center; padding: 0 20px 20px; font-size: 1.25rem; font-weight: 600; color: var(--primary); gap: 10px; }
-        .logo-icon { background: var(--primary); color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.85rem; }
-        .nav-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; color: var(--text-muted); text-decoration: none; font-weight: 500; transition: all 0.2s; }
-        .nav-item:hover { background-color: rgba(0, 0, 0, 0.05); color: var(--text-main); }
-        .nav-item.active { background-color: rgba(99, 102, 241, 0.1); color: var(--primary); border-right: 3px solid var(--primary); }
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            gap: 10px;
+        }
+        .logo-icon {
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .nav-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--text-main);
+        }
+        .nav-item.active {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            border-right: 3px solid var(--primary);
+            border-left: none;
+        }
+        .nav-item:not(.active) {
+            border-left: none;
+        }
 
         /* Main Content */
         .main-content {
             flex: 1;
-            padding: 40px 50px;
+            padding: 24px 32px;
             overflow-y: auto;
-            position: relative;
         }
 
-        /* Ambient Glow behind content */
-        .ambient-glow {
-            position: fixed;
-            top: 20%;
-            right: 10%;
-            width: 50vw;
-            height: 50vw;
-            background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .header {
-            margin-bottom: 40px;
-            position: relative;
-            z-index: 2;
-        }
-        .header h1 { font-size: 2rem; font-weight: 700; background: linear-gradient(90deg, var(--text-main), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .header p { color: var(--text-muted); font-size: 1.05rem; margin-top: 5px; font-weight: 400; }
-
-        .agents-container {
+        .header-top {
             display: flex;
-            flex-direction: column;
-            gap: 30px;
-            position: relative;
-            z-index: 2;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
         }
-
-        /* Glassmorphic Horizontal Cards */
-        .agent-row {
-            display: flex;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .agent-row:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12);
-        }
-
-        /* Colored accent line */
-        .agent-row::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; bottom: 0;
-            width: 6px;
-            background: var(--primary);
-        }
-
-        .row-triage::before { background: linear-gradient(180deg, var(--primary), var(--accent-cyan)); }
-        .row-rag::before { background: linear-gradient(180deg, var(--success), var(--primary)); }
-        .row-bot::before { background: linear-gradient(180deg, var(--warning), var(--danger)); }
-
-        .agent-info {
-            flex: 2;
-            padding-right: 30px;
-            border-right: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .agent-title-wrapper {
+        .header-top h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 12px;
+            gap: 12px;
         }
-
-        .agent-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            color: white;
+        .header-top h1 i { color: var(--primary); }
+        .header-top .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+            margin-left: 40px;
         }
-
-        .icon-triage { background: linear-gradient(135deg, var(--primary), var(--accent-cyan)); }
-        .icon-rag { background: linear-gradient(135deg, var(--success), #34d399); }
-        .icon-bot { background: linear-gradient(135deg, var(--warning), #fbbf24); }
-
-        .agent-name { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
-        .agent-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
-
         .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
+            background: #dcfce7;
+            color: #166534;
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-        }
-
-        .pulse-ring {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            position: relative;
-        }
-        
-        .pulse-active { background-color: var(--success); }
-        .pulse-active::after {
-            content: '';
-            position: absolute;
-            top: -4px; left: -4px; right: -4px; bottom: -4px;
-            border-radius: 50%;
-            border: 2px solid var(--success);
-            animation: pulse-animation 2s infinite;
-        }
-
-        .pulse-training { background-color: var(--warning); }
-        .pulse-training::after {
-            content: '';
-            position: absolute;
-            top: -4px; left: -4px; right: -4px; bottom: -4px;
-            border-radius: 50%;
-            border: 2px solid var(--warning);
-            border-top-color: transparent;
-            animation: spin-animation 1s linear infinite;
-        }
-
-        @keyframes pulse-animation {
-            0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(1.8); opacity: 0; }
-        }
-        @keyframes spin-animation {
-            100% { transform: rotate(360deg); }
-        }
-
-        .agent-stats {
-            flex: 3;
             display: flex;
             align-items: center;
-            justify-content: space-around;
-            padding: 0 20px;
+            gap: 6px;
+        }
+        .status-badge i { font-size: 0.6rem; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-body { padding: 20px; }
+
+        /* Form */
+        textarea.form-control, input.form-control {
+            border-color: var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            padding: 12px;
+            box-shadow: none;
+        }
+        textarea.form-control:focus, input.form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            width: 100%;
         }
 
-        .stat-block {
-            text-align: center;
+        /* Workflow Steps */
+        .workflow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
             position: relative;
         }
-
-        .stat-val {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 5px;
-            font-family: 'Outfit', sans-serif;
-            letter-spacing: -0.5px;
+        .workflow-diagram::before {
+            content: '';
+            position: absolute;
+            top: 45px;
+            left: 50px;
+            right: 50px;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: 1;
         }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .agent-controls {
-            flex: 1;
+        .workflow-step {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            gap: 12px;
-            padding-left: 30px;
-            border-left: 1px solid rgba(0,0,0,0.05);
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            width: 120px;
+            text-align: center;
+            opacity: 0.4;
+            transition: opacity 0.3s;
         }
-
-        .btn-control {
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
+        .workflow-step.active, .workflow-step.completed { opacity: 1; }
+        
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            border: 1px solid transparent;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            position: relative;
+            color: var(--text-muted);
+        }
+        .workflow-step.active .step-icon {
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        .workflow-step.completed .step-icon {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        .workflow-step:nth-child(2).completed .step-icon { background: var(--success); border-color: var(--success); }
+        .workflow-step:nth-child(3).completed .step-icon { background: #8b5cf6; border-color: #8b5cf6; }
+        .workflow-step:nth-child(4).completed .step-icon { background: var(--warning); border-color: var(--warning); }
+        .workflow-step:nth-child(5).completed .step-icon { background: var(--danger); border-color: var(--danger); }
+
+        .step-num {
+            position: absolute;
+            top: -5px; right: -5px;
+            width: 20px; height: 20px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-main);
         }
 
-        .btn-config { background: var(--text-main); color: white; }
-        .btn-config:hover { background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-        
-        .btn-logs { background: transparent; border-color: var(--border-color); color: var(--text-main); }
-        .btn-logs:hover { background: var(--bg-color); }
+        .step-title { font-weight: 600; font-size: 0.85rem; color: var(--text-main); margin-bottom: 4px; }
+        .step-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.3; }
 
-        /* Stickers CSS */
-        .sticker { position: fixed; z-index: 0; opacity: 0.05; pointer-events: none; }
-        .sticker-1 { top: 10%; right: 5%; font-size: 15rem; transform: rotate(-15deg); color: var(--primary); }
-        .sticker-2 { bottom: 10%; left: 22%; font-size: 12rem; transform: rotate(20deg); color: var(--success); }
-        .sticker-3 { top: 40%; right: 30%; font-size: 8rem; transform: rotate(10deg); color: var(--warning); }
-        .sticker-4 { bottom: 30%; right: 10%; font-size: 10rem; transform: rotate(-25deg); color: var(--danger); }
+        /* Agent Status Cards */
+        .agent-status-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .agent-status-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #fafafa;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+        .agent-status-card.active, .agent-status-card.completed {
+            opacity: 1;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .agent-status-card:nth-child(2).completed { border-left-color: var(--success); }
+        .agent-status-card:nth-child(3).completed { border-left-color: #8b5cf6; }
+        .agent-status-card:nth-child(4).completed { border-left-color: var(--warning); }
+        .agent-status-card:nth-child(5).completed { border-left-color: var(--danger); }
+
+        .agent-status-icon {
+            width: 40px; height: 40px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.1rem;
+        }
+        .agent-status-card:nth-child(1) .agent-status-icon { background: var(--primary); }
+        .agent-status-card:nth-child(2) .agent-status-icon { background: var(--success); }
+        .agent-status-card:nth-child(3) .agent-status-icon { background: #8b5cf6; }
+        .agent-status-card:nth-child(4) .agent-status-icon { background: var(--warning); }
+        .agent-status-card:nth-child(5) .agent-status-icon { background: var(--danger); }
+
+        .agent-status-content { flex: 1; }
+        .agent-status-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; display: flex; justify-content: space-between; }
+        .agent-status-desc { font-size: 0.8rem; color: var(--text-muted); }
+        .agent-status-result {
+            font-size: 0.85rem; font-weight: 500; color: var(--text-main); margin-top: 6px;
+            display: none;
+        }
+        .agent-status-card.completed .agent-status-result { display: block; }
+
+        .badge-status {
+            font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: 600;
+        }
+        .badge-pending { background: #f1f5f9; color: #64748b; }
+        .badge-active { background: #e0f2fe; color: #0284c7; }
+        .badge-completed { background: #dcfce7; color: #166534; }
+        .badge-skipped { background: #fee2e2; color: #991b1b; }
+
+        /* Final Output Cards */
+        .output-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: none;
+            background: white;
+            border-left: 4px solid var(--border);
+        }
+        .output-card.show { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .output-card-header {
+            display: flex; align-items: center; gap: 10px; font-weight: 600; margin-bottom: 12px; color: var(--text-main);
+        }
+        .output-card-header i { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; }
+        
+        .output-diagnosis { border-left-color: var(--primary); }
+        .output-diagnosis .output-card-header i { background: var(--primary); }
+        
+        .output-retrieval { border-left-color: var(--success); }
+        .output-retrieval .output-card-header i { background: var(--success); }
+        
+        .output-resolution { border-left-color: #8b5cf6; }
+        .output-resolution .output-card-header i { background: #8b5cf6; }
+        
+        .output-validation { border-left-color: var(--warning); }
+        .output-validation .output-card-header i { background: var(--warning); }
+        
+        .output-email { border-left-color: var(--primary); }
+        .output-email .output-card-header i { background: var(--primary); }
+
+        .output-content { font-size: 0.9rem; color: var(--text-muted); }
+        .output-content strong { color: var(--text-main); }
+        
+        .progress-bar-bg { background: #f1f5f9; height: 8px; border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .progress-bar-fill { background: var(--success); height: 100%; border-radius: 4px; width: 0%; transition: width 1s; }
+
+        .status-pill {
+            display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-top: 8px;
+        }
+        .status-pill.auto { background: #dcfce7; color: #166534; }
+        .status-pill.escalate { background: #fee2e2; color: #991b1b; }
+
+        /* Activity Log */
+        .activity-log {
+            font-size: 0.85rem;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .log-entry {
+            display: flex; gap: 12px; align-items: flex-start;
+            padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;
+        }
+        .log-time { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; margin-top: 2px;}
+        .log-icon { font-size: 0.6rem; margin-top: 4px; }
+        .log-msg { color: var(--text-main); }
+        .log-msg span { color: var(--text-muted); }
+
+        /* Animated Background Stickers */
+        .bg-stickers {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .sticker { 
+            position: absolute; 
+            opacity: 0.04; 
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+            animation: float 20s infinite ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            33% { transform: translateY(-20px) rotate(10deg) scale(1.05); }
+            66% { transform: translateY(15px) rotate(-5deg) scale(0.95); }
+            100% { transform: translateY(0) rotate(0deg) scale(1); }
+        }
+        
+        .sticker-1 { top: 10%; right: 5%; font-size: 16rem; color: var(--primary); animation-delay: 0s; }
+        .sticker-2 { bottom: 10%; left: 22%; font-size: 14rem; color: var(--success); animation-delay: -5s; }
+        .sticker-3 { top: 40%; right: 30%; font-size: 12rem; color: var(--warning); animation-delay: -10s; }
+        .sticker-4 { bottom: 30%; right: 10%; font-size: 15rem; color: var(--danger); animation-delay: -15s; }
+        .sticker-5 { top: 20%; left: 40%; font-size: 10rem; color: #8b5cf6; animation-delay: -7s; }
+        .sticker-6 { top: 70%; right: 40%; font-size: 18rem; color: #06b6d4; animation-delay: -12s; }
+        .sticker-7 { top: -5%; left: 60%; font-size: 20rem; color: #ec4899; animation-delay: -3s; }
+
     </style>
 </head>
-
 <body>
-    <i class="fa-solid fa-robot sticker sticker-1"></i>
-    <i class="fa-solid fa-brain sticker sticker-2"></i>
-    <i class="fa-solid fa-microchip sticker sticker-3"></i>
-    <i class="fa-solid fa-bolt sticker sticker-4"></i>
-    
-    <div class="ambient-glow"></div>
 
-    <div class="sidebar">
+    <div class="bg-stickers">
+        <i class="fa-solid fa-rocket sticker sticker-1"></i>
+        <i class="fa-solid fa-headset sticker sticker-2"></i>
+        <i class="fa-solid fa-ticket sticker sticker-3"></i>
+        <i class="fa-solid fa-microchip sticker sticker-4"></i>
+        <i class="fa-solid fa-chart-pie sticker sticker-5"></i>
+        <i class="fa-solid fa-bolt sticker sticker-6"></i>
+        <i class="fa-solid fa-shield-halved sticker sticker-7"></i>
+    </div>
+
+    <div class="sidebar" style="position: relative; z-index: 1;">
         <div class="logo">
             <div class="logo-icon">SP</div>
             SupportPilot
@@ -294,168 +417,501 @@
         <a href="/integrations" class="nav-item"><i class="fa-solid fa-plug"></i> Integrations</a>
         <a href="/analytics" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
         <a href="/settings" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
-
+        
         <div style="flex-grow: 1;"></div>
         <a href="#" class="nav-item" id="logoutBtn" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h1>AI Agents Command Center</h1>
-            <p>Live monitoring and configuration of your specialized intelligence models</p>
+    <div class="main-content" style="position: relative; z-index: 1;">
+        <div class="header-top">
+            <div>
+                <h1><i class="fa-solid fa-robot"></i> AI Agent</h1>
+                <div class="subtitle">Multi-Agent AI system to diagnose, resolve and manage support tickets</div>
+            </div>
+            <div class="status-badge">
+                <i class="fa-solid fa-circle"></i> System Online
+            </div>
         </div>
 
-        <div class="agents-container">
-            <!-- Triage Classifier -->
-            <div class="agent-row row-triage">
-                <div class="agent-info">
-                    <div class="agent-title-wrapper">
-                        <div class="agent-icon icon-triage"><i class="fa-solid fa-filter"></i></div>
-                        <div class="agent-name">Triage Classifier</div>
+        <div class="row">
+            <!-- Left Column: Input & Activity -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>New Ticket</span>
+                        <div class="input-group input-group-sm" style="width: 180px;">
+                            <input type="number" id="loadTicketId" class="form-control" placeholder="Ticket ID (e.g. 68)">
+                            <button class="btn btn-outline-secondary" style="background-color: var(--card-bg); color: var(--text-main); border-color: var(--border);" type="button" onclick="loadAndProcessTicket()">Load</button>
+                        </div>
                     </div>
-                    <div class="agent-desc">Automatically categorizes incoming tickets and assigns priority based on deep semantic understanding.</div>
-                    <div class="status-badge">
-                        <div class="pulse-ring pulse-active"></div>
-                        Operational
-                    </div>
-                </div>
-                
-                <div class="agent-stats">
-                    <div class="stat-block">
-                        <div class="stat-val live-data" data-target="{{ triage_acc }}">{{ triage_acc }}%</div>
-                        <div class="stat-label">Avg Confidence</div>
-                    </div>
-                    <div class="stat-block">
-                        <div class="stat-val live-data" data-target="{{ triage_count }}">{{ triage_count }}</div>
-                        <div class="stat-label">Tickets Processed</div>
-                    </div>
-                    <div class="stat-block">
-                        <div class="stat-val">0.3s</div>
-                        <div class="stat-label">Inference Latency</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">Ticket Title <span class="text-danger">*</span></label>
+                            <input type="text" id="titleInput" class="form-control" placeholder="VPN Connection Issue">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">Describe your issue <span class="text-danger">*</span></label>
+                            <textarea id="ticketInput" class="form-control" rows="4" placeholder="My VPN is not connecting to the company network."></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label" style="font-size: 0.85rem; font-weight: 500; color: var(--text-muted);">User Email <span class="text-danger">*</span></label>
+                            <input type="email" id="emailInput" class="form-control" placeholder="employee@example.com">
+                        </div>
+                        <button id="processBtn" class="btn btn-primary" onclick="processTicket()">
+                            <i class="fa-solid fa-paper-plane me-2"></i> Process Ticket
+                        </button>
                     </div>
                 </div>
 
-                <div class="agent-controls">
-                    <button class="btn-control btn-config"><i class="fa-solid fa-sliders"></i> Tune Model</button>
-                    <button class="btn-control btn-logs"><i class="fa-solid fa-scroll"></i> View Logs</button>
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Workflow Activity
+                    </div>
+                    <div class="card-body">
+                        <div id="activityLog" class="activity-log">
+                            <div class="text-muted text-center" style="font-size: 0.85rem;" id="emptyLogMsg">Waiting for ticket...</div>
+                            <!-- Logs will be injected here -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- RAG Resolution Engine -->
-            <div class="agent-row row-rag">
-                <div class="agent-info">
-                    <div class="agent-title-wrapper">
-                        <div class="agent-icon icon-rag"><i class="fa-solid fa-book-open-reader"></i></div>
-                        <div class="agent-name">RAG Resolution Engine</div>
+            <!-- Middle Column: Workflow -->
+            <div class="col-md-4">
+                <div class="card" style="min-height: 100%;">
+                    <div class="card-header">
+                        Multi-Agent Workflow
                     </div>
-                    <div class="agent-desc">Retrieves relevant knowledge base articles and generates contextual step-by-step resolutions for agents.</div>
-                    <div class="status-badge">
-                        <div class="pulse-ring pulse-active"></div>
-                        Operational
-                    </div>
-                </div>
-                
-                <div class="agent-stats">
-                    <div class="stat-block">
-                        <div class="stat-val">89.2%</div>
-                        <div class="stat-label">Helpful Rate</div>
-                    </div>
-                    <div class="stat-block">
-                        <div class="stat-val live-data" data-target="{{ rag_generated }}">{{ rag_generated }}</div>
-                        <div class="stat-label">Resolutions Generated</div>
-                    </div>
-                    <div class="stat-block">
-                        <div class="stat-val">1.2s</div>
-                        <div class="stat-label">Generation Latency</div>
-                    </div>
-                </div>
+                    <div class="card-body" style="padding: 10px 20px;">
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">AI agents work together to analyze, retrieve, resolve and manage tickets</p>
+                        
+                        <div class="workflow-diagram">
+                            <div class="workflow-step" id="step1">
+                                <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i><div class="step-num">1</div></div>
+                                <div class="step-title">Diagnosis<br>Agent</div>
+                            </div>
+                            <div class="workflow-step" id="step2">
+                                <div class="step-icon"><i class="fa-solid fa-book-open"></i><div class="step-num">2</div></div>
+                                <div class="step-title">Retrieval<br>Agent</div>
+                            </div>
+                            <div class="workflow-step" id="step3">
+                                <div class="step-icon"><i class="fa-solid fa-wrench"></i><div class="step-num">3</div></div>
+                                <div class="step-title">Resolution<br>Agent</div>
+                            </div>
+                            <div class="workflow-step" id="step4">
+                                <div class="step-icon"><i class="fa-solid fa-shield-halved"></i><div class="step-num">4</div></div>
+                                <div class="step-title">Validation<br>Agent</div>
+                            </div>
+                            <div class="workflow-step" id="step5">
+                                <div class="step-icon"><i class="fa-solid fa-arrow-up-right-dots"></i><div class="step-num">5</div></div>
+                                <div class="step-title">Escalation<br>Agent</div>
+                            </div>
+                        </div>
 
-                <div class="agent-controls">
-                    <button class="btn-control btn-config"><i class="fa-solid fa-database"></i> Edit Sources</button>
-                    <button class="btn-control btn-logs"><i class="fa-solid fa-scroll"></i> View Logs</button>
+                        <div class="agent-status-list">
+                            <!-- Diagnosis -->
+                            <div class="agent-status-card" id="card1">
+                                <div class="agent-status-icon"><i class="fa-solid fa-user-doctor"></i></div>
+                                <div class="agent-status-content">
+                                    <div class="agent-status-title">1. Diagnosis Agent <span class="badge-status badge-pending" id="badge1">Pending</span></div>
+                                    <div class="agent-status-desc">Classifies the issue type and category.</div>
+                                    <div class="agent-status-result" id="res1"></div>
+                                </div>
+                            </div>
+                            <!-- Retrieval -->
+                            <div class="agent-status-card" id="card2">
+                                <div class="agent-status-icon"><i class="fa-solid fa-server"></i></div>
+                                <div class="agent-status-content">
+                                    <div class="agent-status-title">2. Retrieval Agent <span class="badge-status badge-pending" id="badge2">Pending</span></div>
+                                    <div class="agent-status-desc">Searches knowledge base for relevant articles.</div>
+                                    <div class="agent-status-result" id="res2"></div>
+                                </div>
+                            </div>
+                            <!-- Resolution -->
+                            <div class="agent-status-card" id="card3">
+                                <div class="agent-status-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                                <div class="agent-status-content">
+                                    <div class="agent-status-title">3. Resolution Agent <span class="badge-status badge-pending" id="badge3">Pending</span></div>
+                                    <div class="agent-status-desc">Generates step-by-step solution.</div>
+                                    <div class="agent-status-result" id="res3"></div>
+                                </div>
+                            </div>
+                            <!-- Validation -->
+                            <div class="agent-status-card" id="card4">
+                                <div class="agent-status-icon"><i class="fa-solid fa-check-double"></i></div>
+                                <div class="agent-status-content">
+                                    <div class="agent-status-title">4. Validation Agent <span class="badge-status badge-pending" id="badge4">Pending</span></div>
+                                    <div class="agent-status-desc">Calculates confidence score for auto-resolve or escalate.</div>
+                                    <div class="agent-status-result" id="res4"></div>
+                                </div>
+                            </div>
+                            <!-- Escalation -->
+                            <div class="agent-status-card" id="card5">
+                                <div class="agent-status-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                <div class="agent-status-content">
+                                    <div class="agent-status-title">5. Escalation Agent <span class="badge-status badge-pending" id="badge5">Pending</span></div>
+                                    <div class="agent-status-desc">Creates Jira ticket if confidence is below 75%.</div>
+                                    <div class="agent-status-result" id="res5"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
-            <!-- Customer Facing Bot -->
-            <div class="agent-row row-bot">
-                <div class="agent-info">
-                    <div class="agent-title-wrapper">
-                        <div class="agent-icon icon-bot"><i class="fa-solid fa-comments"></i></div>
-                        <div class="agent-name">Customer Facing Bot</div>
+            <!-- Right Column: Outputs -->
+            <div class="col-md-4">
+                <div class="card" style="min-height: 100%; background: #f8fafc;">
+                    <div class="card-header" style="background: white;">
+                        <i class="fa-solid fa-puzzle-piece" style="color: var(--success);"></i> Final Output
                     </div>
-                    <div class="agent-desc">First-line conversational interface that helps users resolve simple queries instantly before ticket creation.</div>
-                    <div class="status-badge" style="color: var(--warning);">
-                        <div class="pulse-ring pulse-training"></div>
-                        Fine-tuning...
-                    </div>
-                </div>
-                
-                <div class="agent-stats" style="opacity: 0.5;">
-                    <div class="stat-block">
-                        <div class="stat-val">--%</div>
-                        <div class="stat-label">Deflection Rate</div>
-                    </div>
-                    <div class="stat-block">
-                        <div class="stat-val">0</div>
-                        <div class="stat-label">Interactions</div>
-                    </div>
-                    <div class="stat-block">
-                        <div class="stat-val">--</div>
-                        <div class="stat-label">CSAT Score</div>
-                    </div>
-                </div>
+                    <div class="card-body" id="finalOutputContainer">
+                        <div class="text-muted text-center mt-5" style="font-size: 0.9rem;" id="emptyOutputMsg">
+                            <i class="fa-solid fa-inbox fa-3x mb-3" style="color: #cbd5e1;"></i><br>
+                            Submit a ticket to view final outputs
+                        </div>
+                        
+                        <!-- Diagnosis Output -->
+                        <div class="output-card output-diagnosis" id="out1">
+                            <div class="output-card-header"><i class="fa-solid fa-user"></i> Diagnosis</div>
+                            <div class="output-content">
+                                Ticket classified as<br>
+                                <strong style="font-size: 1.1rem;" id="out-cat">Network / VPN</strong><br>
+                                Confidence: <strong id="out-diag-conf" class="text-primary">80%</strong>
+                            </div>
+                        </div>
 
-                <div class="agent-controls">
-                    <button class="btn-control btn-config" disabled style="opacity: 0.5; cursor: not-allowed;"><i class="fa-solid fa-spinner fa-spin"></i> Deploying</button>
+                        <!-- Retrieval Output -->
+                        <div class="output-card output-retrieval" id="out2">
+                            <div class="output-card-header"><i class="fa-solid fa-database"></i> Retrieved Knowledge</div>
+                            <div class="output-content">
+                                Article: <strong id="out-article" class="text-success">VPN Connection Troubleshooting</strong><br>
+                                Similarity: <strong id="out-sim">82%</strong>
+                            </div>
+                        </div>
+
+                        <!-- Resolution Output -->
+                        <div class="output-card output-resolution" id="out3">
+                            <div class="output-card-header"><i class="fa-solid fa-list-ol"></i> Resolution Steps</div>
+                            <div class="output-content">
+                                <ol id="out-steps" style="padding-left: 15px; margin-bottom: 0;">
+                                    <!-- Steps injected here -->
+                                </ol>
+                            </div>
+                        </div>
+
+                        <!-- Validation Output -->
+                        <div class="output-card output-validation" id="out4">
+                            <div class="output-card-header"><i class="fa-solid fa-shield"></i> Validation</div>
+                            <div class="output-content">
+                                Final Confidence Score<br>
+                                <strong style="font-size: 1.2rem;" id="out-final-conf">84.8%</strong>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" id="out-bar"></div>
+                                </div>
+                                <div style="margin-top: 10px;">Status</div>
+                                <div class="status-pill auto" id="out-status">AUTO_RESOLVE</div>
+                            </div>
+                        </div>
+
+                        <!-- Action Output (Email or Jira) -->
+                        <div class="output-card output-email" id="out5">
+                            <div class="output-card-header" id="out-action-header"><i class="fa-solid fa-envelope"></i> Email Notification</div>
+                            <div class="output-content">
+                                <div style="display: flex; gap: 8px; align-items: center; color: var(--success); font-weight: 500;" id="out-action-msg">
+                                    <i class="fa-solid fa-circle-check"></i> Email sent successfully
+                                </div>
+                                <div id="out-action-btn-container" style="display: none;">
+                                    <button class="btn btn-sm" style="border: 1px solid #cbd5e1; color: var(--primary); background: white; font-weight: 500; font-size: 0.85rem;"><i class="fa-regular fa-envelope"></i> View Email Logs</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <script>
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            window.location.href = '/login';
-        });
 
-        // Add a nice counting animation to the live numbers
-        document.addEventListener("DOMContentLoaded", () => {
-            const elements = document.querySelectorAll('.live-data');
+    <script>
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        function getTimestamp() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            return hours + ':' + minutes + ' ' + ampm;
+        }
+
+        function addLog(agent, action, iconColor) {
+            const logContainer = document.getElementById('activityLog');
+            const emptyMsg = document.getElementById('emptyLogMsg');
+            if (emptyMsg) {
+                emptyMsg.style.display = 'none';
+            }
             
-            elements.forEach(el => {
-                const targetText = el.getAttribute('data-target');
-                if(!targetText) return;
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <div class="log-time">${getTimestamp()}</div>
+                <div class="log-icon" style="color: ${iconColor};"><i class="fa-solid fa-circle"></i></div>
+                <div class="log-msg"><strong>${agent}</strong> <span>&rarr;</span> ${action}</div>
+            `;
+            logContainer.prepend(logEntry);
+        }
+
+        async function processTicket() {
+            const title = document.getElementById('titleInput').value.trim();
+            const ticket = document.getElementById('ticketInput').value.trim();
+            const email = document.getElementById('emailInput').value.trim();
+            const btn = document.getElementById('processBtn');
+            
+            if(!title) {
+                alert("Please provide a ticket title.");
+                return;
+            }
+            if(!ticket) {
+                alert("Please describe your issue.");
+                return;
+            }
+            if(!email) {
+                alert("Please provide your email.");
+                return;
+            }
+
+            // Reset UI
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> Processing...';
+            document.getElementById('emptyOutputMsg').style.display = 'none';
+            document.getElementById('activityLog').innerHTML = '<div class="text-muted text-center" style="font-size: 0.85rem;" id="emptyLogMsg">Waiting for ticket...</div>';
+            
+            for(let i=1; i<=5; i++) {
+                document.getElementById(`step${i}`).className = 'workflow-step';
+                document.getElementById(`card${i}`).className = 'agent-status-card';
+                document.getElementById(`badge${i}`).className = 'badge-status badge-pending';
+                document.getElementById(`badge${i}`).innerText = 'Pending';
+                document.getElementById(`res${i}`).innerText = '';
+                document.getElementById(`out${i}`).classList.remove('show');
+            }
+            if(document.getElementById('out-action-btn-container')) {
+                document.getElementById('out-action-btn-container').style.display = 'none';
+            }
+            if(document.getElementById('out-action-msg')) {
+                document.getElementById('out-action-msg').style.marginBottom = '0';
+            }
+
+            try {
+                // Call API
+                const response = await fetch('/api/ticket', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: title, ticket: ticket, email: email })
+                });
                 
-                const isFloat = targetText.includes('.');
-                const targetNum = parseFloat(targetText);
+                const data = await response.json();
                 
-                if(isNaN(targetNum) || targetNum === 0) return;
+                if(!data.success) {
+                    alert("Error: " + data.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-paper-plane me-2"></i> Process Ticket';
+                    return;
+                }
+
+                const res = data.result;
+
+                // Step 1: Diagnosis
+                document.getElementById('step1').classList.add('active');
+                document.getElementById('card1').classList.add('active');
+                document.getElementById('badge1').className = 'badge-status badge-active';
+                document.getElementById('badge1').innerText = 'Running...';
+                addLog('Diagnosis Agent started', 'Analyzing text...', 'var(--primary)');
+                await delay(800);
                 
-                let current = 0;
-                const duration = 1500; // ms
-                const stepTime = 20;
-                const steps = duration / stepTime;
-                const increment = targetNum / steps;
+                document.getElementById('step1').classList.replace('active', 'completed');
+                document.getElementById('card1').classList.replace('active', 'completed');
+                document.getElementById('badge1').className = 'badge-status badge-completed';
+                document.getElementById('badge1').innerHTML = '<i class="fa-solid fa-check"></i> Completed';
+                const cat = res.diagnosis.category;
+                const dconf = Math.round(res.diagnosis.confidence * 100);
+                document.getElementById('res1').innerHTML = `Category: <span class="text-primary">${cat}</span> | Confidence: <strong>${dconf}%</strong>`;
+                addLog('Diagnosis Agent', `Classified as ${cat} (${dconf}%)`, 'var(--primary)');
                 
-                const suffix = targetText.includes('%') ? '%' : '';
+                document.getElementById('out-cat').innerText = cat;
+                document.getElementById('out-diag-conf').innerText = `${dconf}%`;
+                document.getElementById('out1').classList.add('show');
                 
-                const timer = setInterval(() => {
-                    current += increment;
-                    if(current >= targetNum) {
-                        current = targetNum;
-                        clearInterval(timer);
-                    }
+                await delay(600);
+
+                // Step 2: Retrieval
+                document.getElementById('step2').classList.add('active');
+                document.getElementById('card2').classList.add('active');
+                document.getElementById('badge2').className = 'badge-status badge-active';
+                document.getElementById('badge2').innerText = 'Running...';
+                addLog('Retrieval Agent started', 'Searching knowledge base...', 'var(--success)');
+                await delay(1000);
+
+                document.getElementById('step2').classList.replace('active', 'completed');
+                document.getElementById('card2').classList.replace('active', 'completed');
+                document.getElementById('badge2').className = 'badge-status badge-completed';
+                document.getElementById('badge2').innerHTML = '<i class="fa-solid fa-check"></i> Completed';
+                const artTitle = res.retrieval.article ? res.retrieval.article.title : "No exact match";
+                const sim = Math.round(res.retrieval.similarity * 100);
+                document.getElementById('res2').innerHTML = `Top Article: <span class="text-success">${artTitle}</span> | Similarity: <strong>${sim}%</strong>`;
+                addLog('Retrieval Agent', `Found relevant article (${sim}% match)`, 'var(--success)');
+                
+                document.getElementById('out-article').innerText = artTitle;
+                document.getElementById('out-sim').innerText = `${sim}%`;
+                document.getElementById('out2').classList.add('show');
+
+                await delay(600);
+
+                // Step 3: Resolution
+                document.getElementById('step3').classList.add('active');
+                document.getElementById('card3').classList.add('active');
+                document.getElementById('badge3').className = 'badge-status badge-active';
+                document.getElementById('badge3').innerText = 'Running...';
+                addLog('Resolution Agent started', 'Generating steps...', '#8b5cf6');
+                await delay(800);
+
+                document.getElementById('step3').classList.replace('active', 'completed');
+                document.getElementById('card3').classList.replace('active', 'completed');
+                document.getElementById('badge3').className = 'badge-status badge-completed';
+                document.getElementById('badge3').innerHTML = '<i class="fa-solid fa-check"></i> Completed';
+                const stepCount = res.resolution.steps.length;
+                document.getElementById('res3').innerHTML = `Solution Steps: <span style="color:#8b5cf6;"><strong>${stepCount} steps generated</strong></span>`;
+                addLog('Resolution Agent', `Generated ${stepCount} troubleshooting steps`, '#8b5cf6');
+                
+                const stepsHtml = res.resolution.steps.map(s => `<li>${s}</li>`).join('');
+                document.getElementById('out-steps').innerHTML = stepsHtml;
+                document.getElementById('out3').classList.add('show');
+
+                await delay(600);
+
+                // Step 4: Validation
+                document.getElementById('step4').classList.add('active');
+                document.getElementById('card4').classList.add('active');
+                document.getElementById('badge4').className = 'badge-status badge-active';
+                document.getElementById('badge4').innerText = 'Running...';
+                addLog('Validation Agent started', 'Calculating scores...', 'var(--warning)');
+                await delay(800);
+
+                document.getElementById('step4').classList.replace('active', 'completed');
+                document.getElementById('card4').classList.replace('active', 'completed');
+                document.getElementById('badge4').className = 'badge-status badge-completed';
+                document.getElementById('badge4').innerHTML = '<i class="fa-solid fa-check"></i> Completed';
+                const finalConf = res.validation.confidence;
+                document.getElementById('res4').innerHTML = `Final Confidence Score: <strong>${finalConf}%</strong>`;
+                addLog('Validation Agent', `Confidence score: ${finalConf}%`, 'var(--warning)');
+                
+                document.getElementById('out-final-conf').innerText = `${finalConf}%`;
+                document.getElementById('out-bar').style.width = `${finalConf}%`;
+                if(finalConf < 70) document.getElementById('out-bar').style.background = 'var(--danger)';
+                else document.getElementById('out-bar').style.background = 'var(--success)';
+                
+                const statPill = document.getElementById('out-status');
+                statPill.innerText = res.validation.status;
+                if(res.validation.status === 'AUTO_RESOLVE') {
+                    statPill.className = 'status-pill auto';
+                } else {
+                    statPill.className = 'status-pill escalate';
+                }
+                document.getElementById('out4').classList.add('show');
+
+                await delay(600);
+
+                // Step 5: Escalation/Action
+                document.getElementById('step5').classList.add('active');
+                document.getElementById('card5').classList.add('active');
+                
+                const isAuto = res.validation.status === 'AUTO_RESOLVE';
+                
+                if(isAuto) {
+                    document.getElementById('card5').style.opacity = '0.7';
+                    document.getElementById('badge5').className = 'badge-status badge-skipped';
+                    document.getElementById('badge5').innerText = 'Skipped';
+                    document.getElementById('res5').innerHTML = 'Ticket confidence is 75% or higher, so no Jira ticket created.';
+                    addLog('System', `Ticket auto-resolved &rarr; Email sent`, 'var(--success)');
                     
-                    if(isFloat) {
-                        el.innerText = current.toFixed(1) + suffix;
+                    document.getElementById('out-action-header').innerHTML = '<i class="fa-solid fa-envelope"></i> Email Notification';
+                    document.getElementById('out-action-msg').style.display = 'flex';
+                    if(data.email && data.email.success) {
+                        document.getElementById('out-action-msg').innerHTML = `<i class="fa-solid fa-circle-check"></i> Email sent successfully to ${email || 'user'}`;
+                        document.getElementById('out-action-msg').style.color = 'var(--success)';
                     } else {
-                        el.innerText = Math.floor(current) + suffix;
+                        document.getElementById('out-action-msg').innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Email simulated (SMTP not configured)`;
+                        document.getElementById('out-action-msg').style.color = 'var(--warning)';
                     }
-                }, stepTime);
-            });
-        });
+                    document.getElementById('out-action-msg').style.marginBottom = '12px';
+                    document.getElementById('out-action-btn-container').style.display = 'block';
+                } else {
+                    document.getElementById('step5').classList.replace('active', 'completed');
+                    document.getElementById('card5').classList.replace('active', 'completed');
+                    document.getElementById('badge5').className = 'badge-status badge-completed';
+                    document.getElementById('badge5').innerHTML = '<i class="fa-solid fa-check"></i> Escalated';
+                    document.getElementById('res5').innerHTML = `Jira Ticket Created`;
+                    addLog('Escalation Agent', `Ticket escalated to Jira`, 'var(--danger)');
+                    
+                    document.getElementById('out-action-header').innerHTML = '<i class="fa-brands fa-jira"></i> Jira Ticket Created';
+                    document.getElementById('out5').classList.replace('output-email', 'output-diagnosis'); // Change color
+                    if(data.jira && data.jira.success) {
+                        document.getElementById('out-action-msg').style.display = 'block';
+                        document.getElementById('out-action-msg').innerHTML = `
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; width: 100%; margin-top: 8px;">
+                                <div><strong style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Ticket ID:</strong><br><span style="color: var(--text-main); font-weight: 600;">${data.jira.ticket_id}</span></div>
+                                <div><strong style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Assignee:</strong><br><span style="color: var(--text-main); font-weight: 600;">Network Team</span></div>
+                                <div><strong style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Status:</strong><br><span style="color: var(--text-main); font-weight: 600;">In Progress</span></div>
+                                <div><strong style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Priority:</strong><br><span style="color: var(--text-main); font-weight: 600;">High</span></div>
+                            </div>
+                        `;
+                    } else {
+                        document.getElementById('out-action-msg').innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Jira simulated (API not configured)`;
+                        document.getElementById('out-action-msg').style.color = 'var(--warning)';
+                    }
+                }
+                
+                document.getElementById('out5').classList.add('show');
+
+            } catch (error) {
+                console.error(error);
+                alert("An error occurred: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane me-2"></i> Process Ticket';
+            }
+        }
+
+        async function loadAndProcessTicket() {
+            const ticketId = document.getElementById('loadTicketId').value;
+            if (!ticketId) {
+                alert("Please enter a Ticket ID.");
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/ticket_data/${ticketId}`);
+                if (!response.ok) {
+                    alert("Ticket not found!");
+                    return;
+                }
+                const data = await response.json();
+                
+                // Populate fields
+                document.getElementById('ticketInput').value = data.description || data.title;
+                document.getElementById('emailInput').value = data.email || '';
+                
+                // Process the ticket automatically
+                processTicket();
+                
+            } catch (error) {
+                console.error("Error loading ticket:", error);
+                alert("Failed to load ticket data.");
+            }
+        }
     </script>
 </body>
-
 </html>

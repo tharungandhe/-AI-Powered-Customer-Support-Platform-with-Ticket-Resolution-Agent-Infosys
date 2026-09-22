@@ -6,3 +6,5 @@ PyJWT
 numpy
 google-genai
 Flask-JWT-Extended
+python-dotenv
+requests

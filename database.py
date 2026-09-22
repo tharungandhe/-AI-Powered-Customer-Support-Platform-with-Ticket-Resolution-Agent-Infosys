@@ -28,9 +28,24 @@ def init_db():
             priority TEXT,
             confidence REAL,
             status TEXT,
+            jira_ticket_id TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+
+    # Migration for existing databases
+    try:
+        cursor.execute("ALTER TABLE tickets ADD COLUMN jira_ticket_id TEXT")
+    except sqlite3.OperationalError:
+        # Column already exists
+        pass
+
+    # Create performance indexes
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tickets_priority ON tickets(priority)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tickets_category ON tickets(category)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tickets_confidence ON tickets(confidence)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tickets_jira_id ON tickets(jira_ticket_id)")
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (

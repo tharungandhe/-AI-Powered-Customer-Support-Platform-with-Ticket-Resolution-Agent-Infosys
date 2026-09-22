@@ -21,7 +21,12 @@ def predict_severity(ticket_text, category="Unknown"):
         "server down",
         "entire company",
         "production down",
-        "security breach"
+        "security breach",
+        "client meeting",
+        "vpn not working",
+        "vpn is not connecting",
+        "network down",
+        "no internet"
     ]
     
     high_words = [
@@ -31,11 +36,15 @@ def predict_severity(ticket_text, category="Unknown"):
         "iportant",
         "cannot work",
         "business stopped",
-        "client meeting",
-        "vpn not working",
-        "vpn is not connecting",
-        "network down",
-        "no internet"
+        "stuck",
+        "blocker",
+        "can't",
+        "failing",
+        "timeout",
+        "crashing",
+        "deadline",
+        "delay",
+        "waiting"
     ]
     
     medium_words = [
@@ -45,7 +54,14 @@ def predict_severity(ticket_text, category="Unknown"):
         "issue",
         "network",
         "internet",
-        "wifi"
+        "wifi",
+        "bug",
+        "help",
+        "glitch",
+        "how to",
+        "question",
+        "typo",
+        "incorrect"
     ]
     
     for word in critical_words:

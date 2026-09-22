@@ -608,6 +608,11 @@
                                 <span class="result-value" id="res-priority">P1 - Critical</span>
                             </div>
                         </div>
+                        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                            <a id="go-resolution-btn" href="#" class="btn" style="background-color: black; color: white;">
+                                Next <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </div>
                     </div>
 
                     <div class="ticket-list" id="recentTickets">
@@ -768,10 +773,8 @@
                     // Reset form
                     document.getElementById('ticketForm').reset();
                     
-                    // Add automatic transition to Milestone 2 (Resolution Generation) page
-                    setTimeout(() => {
-                        window.location.href = `/ticket/${data.ticket_id}`;
-                    }, 3000);
+                    // Set the link for the manual redirect button
+                    document.getElementById('go-resolution-btn').href = `/ticket/${data.ticket_id}`;
                 } else {
                     alert('Error submitting ticket: ' + (data.error || 'Unknown error'));
                 }

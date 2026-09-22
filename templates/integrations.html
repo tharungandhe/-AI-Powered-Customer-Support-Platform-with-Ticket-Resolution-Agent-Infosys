@@ -291,28 +291,7 @@
         </div>
 
         <div class="integrations-grid">
-            <div class="integration-card">
-                <div class="card-top">
-                    <div class="platform-info">
-                        <div class="platform-icon icon-slack"><i class="fa-brands fa-slack"></i></div>
-                        <div>
-                            <div class="platform-name">Slack</div>
-                            <div class="platform-status connected"><i class="fa-solid fa-circle-check"></i> Connected</div>
-                        </div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="integration-desc">
-                    Receive ticket notifications, create tickets directly from messages, and deploy the AI triage bot in designated channels.
-                </div>
-                <div class="sync-info">
-                    <span>Last synced: 2 mins ago</span>
-                    <button class="sync-btn"><i class="fa-solid fa-arrows-rotate"></i> Sync Now</button>
-                </div>
-            </div>
+
 
             <div class="integration-card">
                 <div class="card-top">
@@ -333,59 +312,67 @@
                 </div>
                 <div class="sync-info">
                     <span>Last synced: 15 mins ago</span>
-                    <button class="sync-btn"><i class="fa-solid fa-arrows-rotate"></i> Sync Now</button>
+                    <div style="display: flex; gap: 15px;">
+                        <button class="sync-btn" onclick="toggleJiraLogs()"><i class="fa-solid fa-list"></i> View Logs</button>
+                        <button class="sync-btn"><i class="fa-solid fa-arrows-rotate"></i> Sync</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="integration-card">
-                <div class="card-top">
-                    <div class="platform-info">
-                        <div class="platform-icon icon-salesforce"><i class="fa-brands fa-salesforce"></i></div>
-                        <div>
-                            <div class="platform-name">Salesforce</div>
-                            <div class="platform-status">Not connected</div>
-                        </div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="integration-desc">
-                    Link tickets to customer profiles. Display CRM context directly in the ticket resolution interface for agents.
-                </div>
-                <div class="sync-info">
-                    <span>Never synced</span>
-                    <button class="sync-btn" style="color: var(--text-muted);"><i class="fa-solid fa-link"></i> Connect</button>
-                </div>
+
+        </div>
+        </div>
+
+        <div id="jira-logs-container" style="display: none;">
+            <div class="header" style="margin-top: 40px; border-top: 1px solid var(--border-color); padding-top: 30px;">
+                <h2>Jira Escalation Logs</h2>
+                <p>History of tickets escalated to Jira Service Management</p>
             </div>
-            
-            <div class="integration-card">
-                <div class="card-top">
-                    <div class="platform-info">
-                        <div class="platform-icon" style="background-color: #17494D; color: white;"><i class="fa-solid fa-z"></i></div>
-                        <div>
-                            <div class="platform-name">Zendesk</div>
-                            <div class="platform-status">Not connected</div>
-                        </div>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="integration-desc">
-                    Import historical ticket data to train SupportPilot models, or run as a side-car assistant in Zendesk UI.
-                </div>
-                <div class="sync-info">
-                    <span>Never synced</span>
-                    <button class="sync-btn" style="color: var(--text-muted);"><i class="fa-solid fa-link"></i> Connect</button>
-                </div>
-            </div>
+
+        <div style="background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 40px;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: rgba(0, 0, 0, 0.02); border-bottom: 1px solid var(--border-color);">
+                        <th style="padding: 15px 20px; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">SupportPilot ID</th>
+                        <th style="padding: 15px 20px; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Ticket Title</th>
+                        <th style="padding: 15px 20px; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">User Email</th>
+                        <th style="padding: 15px 20px; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Jira Ticket ID</th>
+                        <th style="padding: 15px 20px; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in jira_logs %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 15px 20px; font-weight: 500; color: var(--primary);">#T-2023-{{ log.ticket_id }}</td>
+                        <td style="padding: 15px 20px;">{{ log.title }}</td>
+                        <td style="padding: 15px 20px; color: var(--text-muted);">{{ log.email or 'N/A' }}</td>
+                        <td style="padding: 15px 20px;"><span style="background: #e0e7ff; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;"><i class="fa-brands fa-jira"></i> {{ log.jira_ticket_id }}</span></td>
+                        <td style="padding: 15px 20px; font-size: 0.9rem; color: var(--text-muted);">{{ log.created_at }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="padding: 30px; text-align: center; color: var(--text-muted);">No Jira escalations logged yet. Submit an escalated ticket via the AI Agent to see it here!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         </div>
     </div>
     
     <script>
+        function toggleJiraLogs() {
+            const container = document.getElementById('jira-logs-container');
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                setTimeout(() => {
+                    container.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
         document.getElementById('logoutBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
