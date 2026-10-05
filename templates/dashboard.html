@@ -1,532 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SupportPilot - Dashboard</title>
+    <title>SupportPilot - AI Ticket Resolution Agent</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-color: #f1f5f9;
+            --sidebar-bg: #ffffff;
+            --sidebar-text: #1e293b;
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #0f172a;
+            --text-main: #1e293b;
             --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #3b82f6;
+            --border-color: #e5e7eb;
+            
+            --blue: #3b82f6;
+            --green: #10b981;
+            --purple: #8b5cf6;
+            --yellow: #f59e0b;
+            --red: #ef4444;
+            --cyan: #06b6d4;
+            --light-blue: #0ea5e9;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            min-height: 100vh;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; min-height: 100vh; font-size: 14px; }
+        
         /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            z-index: 10;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            padding: 0 20px 20px;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-            gap: 10px;
-        }
-
-        .logo-icon {
-            background: var(--primary);
-            color: white;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-size: 0.85rem;
-        }
-
-        .nav-item {
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .nav-item:hover {
-            background-color: rgba(0, 0, 0, 0.03);
-            color: var(--text-main);
-        }
-
-        .nav-item.active {
-            background-color: rgba(79, 70, 229, 0.1);
-            color: var(--primary);
-            border-right: 3px solid var(--primary);
-        }
-
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        .btn:hover {
-            background-color: var(--primary-hover);
-        }
+        .sidebar { width: 250px; background-color: var(--card-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px 0; flex-shrink: 0; }
+        .logo { padding: 0 20px 20px; font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; color: var(--blue); }
+        .logo span { font-size: 12px; color: var(--text-muted); font-weight: normal; display: block; }
+        .nav-section { padding: 0 20px; margin-bottom: 10px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        
+        .nav-item { padding: 10px 20px; display: flex; align-items: center; gap: 12px; color: var(--text-muted); text-decoration: none; font-weight: 500; transition: all 0.2s; }
+        .nav-item:hover { background-color: rgba(0,0,0,0.05); color: var(--text-main); }
+        .nav-item.active { background-color: rgba(59, 130, 246, 0.1); color: var(--blue); font-weight: 600; margin: 0 10px; border-radius: 6px; padding: 10px; width: calc(100% - 20px); border-right: 3px solid var(--blue); }
+        .system-status { margin-top: auto; padding: 20px; font-size: 12px; color: var(--text-muted); }
+        .system-status .online { color: var(--green); font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
 
         /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: 30px 40px;
-            overflow-y: auto;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        .main-content { 
+            flex: 1; 
+            padding: 20px 30px; 
+            overflow-y: auto; 
+            background: linear-gradient(rgba(248, 250, 252, 0.9), rgba(248, 250, 252, 0.9)), url('/static/dashboard_sticker.jpg') bottom right/350px no-repeat;
+            background-attachment: fixed;
         }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+        .header h1 { font-size: 1.5rem; font-weight: 700; color: #1e3a8a; margin-bottom: 4px; }
+        .header p { color: var(--text-muted); font-size: 0.95rem; }
+        .header-right { display: flex; align-items: center; gap: 20px; color: var(--text-muted); font-size: 0.9rem; }
+        .user-profile { font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .avatar { width: 28px; height: 28px; background: #94a3b8; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; }
 
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .header-logo {
-            background: var(--primary);
-            color: white;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        .header h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        /* Metrics */
+        .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 15px; }
+        .metric-card { background: var(--card-bg); border-radius: 8px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; }
+        .metric-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .metric-details { display: flex; flex-direction: column; }
+        .metric-title { color: #4b5563; font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+        .metric-value { font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 2px; }
+        .metric-trend { font-size: 0.75rem; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+        .trend-up { color: var(--green); }
+        .trend-down { color: var(--red); }
+        .trend-neutral { color: var(--text-muted); }
+        .trend-text { color: #9ca3af; font-weight: normal; }
         
-        .header h1 span {
-            color: var(--text-muted);
-            font-weight: 500;
-        }
+        /* Specific metric colors */
+        .mc-blue .metric-icon { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+        .mc-green .metric-icon { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+        .mc-purple .metric-icon { background: rgba(139, 92, 246, 0.15); color: var(--purple); }
+        .mc-yellow .metric-icon { background: rgba(245, 158, 11, 0.15); color: var(--yellow); }
+        .mc-red .metric-icon { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+        .mc-cyan .metric-icon { background: rgba(6, 182, 212, 0.15); color: var(--cyan); }
+        .mc-lightblue .metric-icon { background: rgba(14, 165, 233, 0.15); color: var(--light-blue); }
 
-        .global-search {
-            position: relative;
-            margin-left: auto;
-            width: 350px;
-        }
-
-        .global-search input {
-            width: 100%;
-            padding: 12px 15px 12px 40px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            font-size: 0.95rem;
-            outline: none;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        .global-search input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
-
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            margin-top: 8px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            display: none;
-            overflow: hidden;
-        }
-
-        .search-result-item {
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            color: var(--text-main);
-            text-decoration: none;
-            transition: background-color 0.2s;
-            border-bottom: 1px solid rgba(0,0,0,0.02);
-        }
-
-        .search-result-item:last-child {
-            border-bottom: none;
-        }
-
-        .search-result-item:hover {
-            background-color: rgba(79, 70, 229, 0.05);
-            color: var(--primary);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            transition: transform 0.2s;
-        }
+        /* Charts Section */
+        .section-card { background: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border-color); margin-bottom: 20px; }
+        .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; color: var(--text-main); }
         
-        .stat-card:hover {
-            transform: translateY(-2px);
-        }
+        .charts-grid { display: grid; grid-template-columns: 1.5fr repeat(5, 1fr); gap: 15px; }
+        .chart-container { display: flex; flex-direction: column; align-items: center; position: relative; }
+        .chart-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 10px; color: var(--text-main); text-align: center; }
+        .canvas-wrapper { width: 100%; height: 160px; position: relative; display: flex; justify-content: center; }
+        
+        /* Chart Center Text for Donuts */
+        .donut-inner-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
+        .donut-inner-val { font-size: 1.1rem; font-weight: 700; color: #111827; }
+        .donut-inner-lbl { font-size: 0.65rem; color: var(--text-muted); }
 
-        .stat-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .icon-total { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-        .icon-open { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .icon-urgent { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .icon-ai { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
-
-        .stat-info h3 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 4px;
-            color: var(--text-main);
-            line-height: 1;
-        }
-
-        .stat-info p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        /* 3-Column Layout */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1.2fr 1fr;
-            gap: 20px;
-            align-items: start;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card-header {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-main);
-        }
-
-        /* Table Styles */
-        .table-container {
-            overflow-x: auto;
-            max-height: 400px;
-            overflow-y: auto;
-        }
+        /* Tables */
+        .tables-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .table-card { background: var(--card-bg); border-radius: 8px; padding: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column; }
+        .table-container { max-height: 400px; overflow-y: auto; }
+        .table-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); position: sticky; top: 0; z-index: 10; }
+        .table-header h3 { font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .badge-red { background: #fee2e2; color: var(--red); }
+        .badge-blue { background: #dbeafe; color: var(--blue); }
         
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 14px 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 12px 20px; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); background: #f9fafb; }
+        td { padding: 12px 20px; font-size: 0.85rem; border-bottom: 1px solid var(--border-color); color: #374151; }
+        tr:last-child td { border-bottom: none; }
         
-        tr:hover td {
-            background-color: rgba(0,0,0,0.01);
-        }
-
-        .badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .badge-p1, .badge-p2 { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .badge-p3 { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-        .badge-p4 { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        /* Status Tags */
+        .tag { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+        .tag-critical, .tag-P1 { color: var(--red); }
+        .tag-high, .tag-P2 { color: #ea580c; }
+        .tag-medium, .tag-P3 { color: var(--yellow); }
+        .tag-low, .tag-P4 { color: var(--green); }
         
-        .status-open { color: var(--warning); font-weight: 600; }
-        .status-closed { color: var(--text-muted); font-weight: 600; }
-        .status-resolved { color: var(--success); font-weight: 600; }
-
-        /* Middle Column Flex */
-        .mini-stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+        .tag-failed { background: #fee2e2; color: var(--red); }
+        .tag-escalated { background: #fef3c7; color: var(--yellow); }
+        .tag-resolved { background: #d1fae5; color: var(--green); }
+        .tag-open { background: #dbeafe; color: var(--blue); }
         
-        .mini-stat-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .mini-stat-card h4 {
-            color: var(--text-main);
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .mini-stat-card h4 i {
-            color: var(--primary);
-        }
-        
-        .mini-stat-card h2 {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--text-main);
-        }
-
-        /* Right Column Agents */
-        .agent-header {
-            background: rgba(79, 70, 229, 0.05);
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
-        
-        .agent-card {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 15px;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        
-        .agent-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
-        }
-        
-        .agent-card-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 12px;
-            color: var(--text-main);
-        }
-        
-        .agent-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.9rem;
-        }
-        
-        .bg-blue { background: #3b82f6; }
-        .bg-green { background: #10b981; }
-        .bg-purple { background: #8b5cf6; }
-        
-        .agent-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            line-height: 1.4;
-            margin-bottom: 15px;
-        }
-        
-        .agent-stats {
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .agent-stat-item {
-            text-align: left;
-        }
-        
-        .agent-stat-item span {
-            display: block;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        
-        .agent-stat-item strong {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        /* Animated Background Stickers */
-        .bg-stickers {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            overflow: hidden;
-            z-index: 0;
-            pointer-events: none;
-        }
-        .sticker { 
-            position: absolute; 
-            opacity: 0.04; 
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
-            animation: float 20s infinite ease-in-out;
-        }
-        @keyframes float {
-            0% { transform: translateY(0) rotate(0deg) scale(1); }
-            33% { transform: translateY(-20px) rotate(10deg) scale(1.05); }
-            66% { transform: translateY(15px) rotate(-5deg) scale(0.95); }
-            100% { transform: translateY(0) rotate(0deg) scale(1); }
-        }
-        
-        .sticker-1 { top: 10%; right: 10%; font-size: 16rem; color: var(--primary); animation-delay: 0s; }
-        .sticker-2 { bottom: 15%; left: 25%; font-size: 14rem; color: var(--success); animation-delay: -5s; }
-        .sticker-3 { top: 40%; left: 10%; font-size: 12rem; color: var(--warning); animation-delay: -10s; }
-        .sticker-4 { bottom: 20%; right: 15%; font-size: 15rem; color: var(--danger); animation-delay: -15s; }
-        .sticker-5 { top: 20%; left: 40%; font-size: 10rem; color: #8b5cf6; animation-delay: -7s; }
-        .sticker-6 { top: 70%; right: 40%; font-size: 18rem; color: #06b6d4; animation-delay: -12s; }
-        .sticker-7 { top: -5%; left: 60%; font-size: 20rem; color: #ec4899; animation-delay: -3s; }
-
     </style>
 </head>
-
 <body>
-    <div class="bg-stickers">
-        <i class="fa-solid fa-chart-pie sticker sticker-1"></i>
-        <i class="fa-solid fa-robot sticker sticker-2"></i>
-        <i class="fa-solid fa-headset sticker sticker-3"></i>
-        <i class="fa-solid fa-server sticker sticker-4"></i>
-        <i class="fa-solid fa-microchip sticker sticker-5"></i>
-        <i class="fa-solid fa-shield-halved sticker sticker-6"></i>
-        <i class="fa-solid fa-cloud sticker sticker-7"></i>
-    </div>
-    <div class="sidebar" style="position: relative; z-index: 10;">
+    <!-- Sidebar -->
+    <div class="sidebar">
         <div class="logo">
-            <div class="logo-icon">SP</div>
-            SupportPilot
+            <div class="avatar" style="background: var(--blue); color: white; font-size: 16px; border-radius: 8px;"><i class="fa-solid fa-robot"></i></div>
+            <div>
+                SupportPilot
+                <span>AI Ticket Resolution Agent</span>
+            </div>
         </div>
+        
+        <div class="nav-section">Menu</div>
         <a href="/dashboard" class="nav-item active"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
         <a href="/" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
         <a href="/resolution" class="nav-item"><i class="fa-solid fa-lightbulb"></i> Resolution</a>
@@ -534,306 +140,528 @@
         <a href="/integrations" class="nav-item"><i class="fa-solid fa-plug"></i> Integrations</a>
         <a href="/analytics" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
         <a href="/settings" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
-
-        <div style="flex-grow: 1;"></div>
-        <a href="#" class="nav-item" id="logoutBtn" style="color: var(--danger);"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        
+        <div class="system-status">
+            <div class="online"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> System Online</div>
+            v1.0.0
+        </div>
     </div>
 
+    <!-- Main Content -->
     <div class="main-content">
+        <!-- Header -->
         <div class="header">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div class="header-logo">SP</div>
-                <h1>SupportPilot</h1>
+            <div>
+                <h1>Dashboard & optimization</h1>
+            </div>
+            <div class="header-right">
+                <div style="position: relative; margin-right: 10px;">
+                    <div style="display: flex; align-items: center; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 12px;">
+                        <i class="fa-solid fa-search" style="color: var(--text-muted); margin-right: 8px;"></i>
+                        <input type="text" id="nav-search-input" onkeyup="filterNavSearch()" placeholder="Search pages..." style="border: none; background: transparent; outline: none; font-size: 13px; color: var(--text-main); width: 160px;">
+                    </div>
+                    <div id="nav-search-results" style="display: none; position: absolute; top: 38px; left: 0; width: 100%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); max-height: 200px; overflow-y: auto;">
+                    </div>
+                </div>
+                <button onclick="window.location.href='/'" style="background: #000000; color: white; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-right: 15px; font-size: 13px; transition: all 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                    <i class="fa-solid fa-plus"></i> New Ticket
+                </button>
+                <div><i class="fa-regular fa-calendar"></i> <span id="current-time"></span></div>
+                <div class="user-profile">
+                    <div class="avatar"><i class="fa-solid fa-user"></i></div> 
+                    {% if session.get('user') %}
+                        {{ session.get('user').split('@')[0].title() }}
+                    {% else %}
+                        Customer Name
+                    {% endif %}
+                    <i class="fa-solid fa-caret-down"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric Rows -->
+        <div class="metrics-row">
+            <div class="metric-card mc-blue">
+                <div class="metric-icon"><i class="fa-solid fa-ticket"></i></div>
+                <div class="metric-details">
+                    <div class="metric-title">Total Tickets</div>
+                    <div class="metric-value" id="val-total-tickets">--</div>
+                    <div class="metric-trend trend-neutral"><i class="fa-solid fa-minus"></i> Live Sync</div>
+                </div>
+            </div>
+            <div class="metric-card mc-green">
+                <div class="metric-icon"><i class="fa-solid fa-robot"></i></div>
+                <div class="metric-details">
+                    <div class="metric-title">AI Resolution Rate</div>
+                    <div class="metric-value" id="val-ai-res-rate">--%</div>
+                    <div class="metric-trend trend-neutral"><i class="fa-solid fa-minus"></i> Live Sync</div>
+                </div>
+            </div>
+            <div class="metric-card mc-purple">
+                <div class="metric-icon"><i class="fa-regular fa-clock"></i></div>
+                <div class="metric-details">
+                    <div class="metric-title">Average Resolution Time</div>
+                    <div class="metric-value" id="val-avg-res-time">2.1 min</div>
+                    <div class="metric-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> Optimized by AI</div>
+                </div>
+            </div>
+            <div class="metric-card mc-yellow">
+                <div class="metric-icon"><i class="fa-solid fa-star"></i></div>
+                <div class="metric-details">
+                    <div class="metric-title">Customer Satisfaction</div>
+                    <div class="metric-value" id="val-csat">92%</div>
+                    <div class="metric-trend trend-neutral"><i class="fa-solid fa-minus"></i> Average Rating</div>
+                </div>
+            </div>
+        </div>
+        
+
+
+        <!-- Volume & Optimization Row -->
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; margin-bottom: 25px;">
+            <!-- Volume Chart -->
+            <div class="section-card" style="margin-bottom: 0;">
+                <div class="section-title"><i class="fa-solid fa-chart-line" style="margin-right: 8px;"></i> Ticket Volume & Resolution</div>
+                <div class="canvas-wrapper" style="height: 250px;">
+                    <canvas id="chart-volume"></canvas>
+                </div>
             </div>
             
-            <div class="global-search">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="globalSearchInput" placeholder="Search pages (e.g. Tickets, Resolution)..." autocomplete="off">
-                <div class="search-results" id="searchResults"></div>
+            <!-- System Optimization Metrics -->
+            <div class="section-card" style="margin-bottom: 0; display: flex; flex-direction: column;">
+                <div class="section-title"><i class="fa-solid fa-check-circle" style="margin-right: 8px; color: var(--success);"></i> System Optimization Metrics</div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex-grow: 1; align-content: center;">
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Classification Accuracy</span>
+                        <span style="font-weight: 700; color: var(--text-main); font-size: 16px; margin-bottom: 6px;"><span id="opt-val-classacc">91.5%</span></span>
+                        <div style="width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px;">
+                            <div style="width: 91.5%; height: 100%; background-color: var(--blue); border-radius: 3px;" id="opt-bar-classacc"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Resolution Success Rate</span>
+                        <span style="font-weight: 700; color: var(--text-main); font-size: 16px; margin-bottom: 6px;"><span id="opt-val-ressuccess">89%</span></span>
+                        <div style="width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px;">
+                            <div style="width: 89%; height: 100%; background-color: var(--danger); border-radius: 3px;" id="opt-bar-ressuccess"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Knowledge Base Coverage</span>
+                        <span style="font-weight: 700; color: var(--text-main); font-size: 16px; margin-bottom: 6px;"><span id="opt-val-kbcov">88.3%</span></span>
+                        <div style="width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px;">
+                            <div style="width: 88.3%; height: 100%; background-color: var(--warning); border-radius: 3px;" id="opt-bar-kbcov"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">System Uptime</span>
+                        <span style="font-weight: 700; color: var(--text-main); font-size: 16px; margin-bottom: 6px;">99.7% <span style="font-size: 10px; font-weight: normal; color: var(--success); margin-left: 5px;">(Monitored)</span></span>
+                        <div style="width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px;">
+                            <div style="width: 99.7%; height: 100%; background-color: #8b5cf6; border-radius: 3px;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Avg. Response Gen Time</span>
+                        <span style="font-weight: 700; color: var(--text-main); font-size: 16px; margin-bottom: 6px;">0.85s</span>
+                        <div style="width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px;">
+                            <div style="width: 80%; height: 100%; background-color: var(--blue); border-radius: 3px;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">User Satisfaction</span>
+                        <span style="font-weight: 700; color: var(--text-main); font-size: 16px; margin-bottom: 6px;">92%</span>
+                        <div style="width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px;">
+                            <div style="width: 92%; height: 100%; background-color: var(--success); border-radius: 3px;"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <a href="/" class="btn">
-                <i class="fa-solid fa-plus"></i> New Ticket
-            </a>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon icon-total"><i class="fa-solid fa-layer-group"></i></div>
-                <div class="stat-info">
-                    <h3 id="stat-total-tickets">{{ total_tickets }}</h3>
-                    <p>Total Tickets</p>
+        <!-- Charts -->
+        <div class="section-card">
+            <div class="section-title">Ticket Analytics</div>
+            <div class="charts-grid">
+                
+                <div class="chart-container" style="align-items: flex-start;">
+                    <div class="chart-title" style="align-self: flex-start; margin-left: 20px;">Tickets by Category</div>
+                    <div class="canvas-wrapper"><canvas id="chart-cat"></canvas></div>
                 </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon icon-open"><i class="fa-solid fa-envelope-open-text"></i></div>
-                <div class="stat-info">
-                    <h3 id="stat-open-tickets">{{ open_tickets }}</h3>
-                    <p>Open Tickets</p>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Tickets by Priority</div>
+                    <div class="canvas-wrapper">
+                        <canvas id="chart-pri"></canvas>
+                        <div class="donut-inner-text">
+                            <div class="donut-inner-val" id="inner-val-pri">--</div>
+                            <div class="donut-inner-lbl">Total Tickets</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon icon-urgent"><i class="fa-solid fa-fire"></i></div>
-                <div class="stat-info">
-                    <h3 id="stat-high-priority">{{ high_priority }}</h3>
-                    <p>High Priority</p>
+                
+                <div class="chart-container">
+                    <div class="chart-title">AI Resolved vs Escalated</div>
+                    <div class="canvas-wrapper">
+                        <canvas id="chart-ai-esc"></canvas>
+                        <div class="donut-inner-text">
+                            <div class="donut-inner-val" id="inner-val-aiesc">--</div>
+                            <div class="donut-inner-lbl">Total Tickets</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon icon-ai"><i class="fa-solid fa-brain"></i></div>
-                <div class="stat-info">
-                    <h3 id="stat-avg-confidence">{{ avg_confidence }}%</h3>
-                    <p>Avg AI Confidence</p>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Resolution Success</div>
+                    <div class="canvas-wrapper">
+                        <canvas id="chart-res-succ"></canvas>
+                        <div class="donut-inner-text">
+                            <div class="donut-inner-val" id="inner-val-ressucc">--%</div>
+                            <div class="donut-inner-lbl">Success Rate</div>
+                        </div>
+                    </div>
                 </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Classification Accuracy</div>
+                    <div class="canvas-wrapper">
+                        <canvas id="chart-class-acc"></canvas>
+                        <div class="donut-inner-text">
+                            <div class="donut-inner-val" id="inner-val-classacc">--%</div>
+                            <div class="donut-inner-lbl">Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">KB Coverage</div>
+                    <div class="canvas-wrapper">
+                        <canvas id="chart-kb-cov"></canvas>
+                        <div class="donut-inner-text">
+                            <div class="donut-inner-val" id="inner-val-kbcov">--%</div>
+                            <div class="donut-inner-lbl">Coverage</div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
         </div>
 
-        <div class="dashboard-grid">
-            <!-- Left Column: Recent Activity -->
-            <div class="card" style="height: 100%;">
-                <div class="card-header">
-                    <i class="fa-solid fa-clock-rotate-left" style="color: var(--text-muted);"></i> Recent Activity
+
+
+        <div style="display: flex; gap: 20px; margin-bottom: 40px;">
+            <div class="table-card" style="flex: 2; margin-bottom: 0;">
+                <div class="table-header">
+                    <h3 style="color: var(--blue);"><i class="fa-regular fa-file-lines"></i> Recent Tickets</h3>
+                    <a href="#" style="color: var(--blue); text-decoration: none; font-size: 0.85rem; font-weight: 600;">View All Tickets &rarr;</a>
                 </div>
-                <div class="table-container">
+                <div class="table-container" style="max-height: 250px; overflow-y: auto;">
                     <table>
                         <thead>
                             <tr>
                                 <th>Ticket ID</th>
-                                <th>Title</th>
                                 <th>Category</th>
                                 <th>Priority</th>
                                 <th>Status</th>
+                                <th>AI Confidence</th>
                             </tr>
                         </thead>
-                        <tbody id="recent-tickets-tbody">
-                            {% for t in recent_tickets %}
-                            <tr style="cursor: pointer;" onclick="window.location.href='/ticket/{{ t.id }}'">
-                                <td style="font-weight: 600; color: var(--primary);">#T-2023-{{ t.id }}</td>
-                                <td>{{ t.title }}</td>
-                                <td>{{ t.category }}</td>
-                                <td><span class="badge badge-{{ t.priority | lower }}">{{ t.priority }}</span></td>
-                                <td class="status-{{ t.status | lower }}">{{ t.status }}</td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">No recent tickets available.</td>
-                            </tr>
-                            {% endfor %}
+                        <tbody id="table-recent">
+                            <!-- Populated by JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Middle Column: Chart & Mini Stats -->
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-                <div class="card" style="flex: 1; margin-bottom: 0;">
-                    <div class="card-header">
-                        <i class="fa-solid fa-chart-column" style="color: var(--text-muted);"></i> Tickets by Category
-                    </div>
-                    <div style="position: relative; height: 100%; min-height: 200px;">
-                        <canvas id="categoryChart"></canvas>
-                    </div>
+            <div class="table-card" style="flex: 1; margin-bottom: 0;">
+                <div class="table-header">
+                    <h3 style="color: var(--blue);"><i class="fa-solid fa-code-branch"></i> Escalation Workflow Status</h3>
                 </div>
-                <div class="mini-stats-grid">
-                    <div class="mini-stat-card">
-                        <h4><i class="fa-solid fa-stopwatch"></i> Mean Time to Resolution</h4>
-                        <h2>{{ mean_time_to_resolution }}</h2>
+                <div style="padding: 20px; display: flex; flex-direction: column; gap: 25px;">
+                    <div>
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">AI Classification</div>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--text-main);" id="val-classified-today">--</div>
+                        <div style="font-size: 0.8rem; color: var(--green); margin-top: 4px;"><i class="fa-solid fa-check-circle"></i> Tickets classified today</div>
                     </div>
-                    <div class="mini-stat-card">
-                        <h4><i class="fa-solid fa-shield-halved"></i> AI Deflection Rate</h4>
-                        <h2 id="stat-deflection-rate">{{ deflection_rate }}%</h2>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column: AI Agents -->
-            <div class="card" style="height: 100%;">
-                <div class="card-header">
-                    <i class="fa-solid fa-robot" style="color: var(--primary);"></i> AI Agents Command Center
-                </div>
-                
-                
-
-                <div class="agent-card" style="margin-bottom: 0;">
-                    <div class="agent-card-title">
-                        <div class="agent-icon" style="background: #0052CC;"><i class="fa-brands fa-jira"></i></div>
-                        Jira Integration
-                    </div>
-                    <p class="agent-desc">Automatically tracks all support requests as Jira tickets.</p>
-                    <div class="agent-stats">
-                        <div class="agent-stat-item">
-                            <span>Jira Tickets</span>
-                            <strong>{{ jira_tickets }}</strong>
-                        </div>
-                        <div class="agent-stat-item">
-                            <span>History</span>
-                            <strong><a href="/integrations" style="text-decoration: none; color: var(--primary);">View <i class="fa-solid fa-arrow-right"></i></a></strong>
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 25px;">
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 15px; text-transform: uppercase;">AI Resolution Attempt</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--blue);" id="val-resolved-auto">--</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Resolved Automatically</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--yellow);" id="val-escalated-human">--</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Escalated to Human</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
-    
+
     <script>
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            window.location.href = '/login';
+        // Update Time
+        const dateOptions = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+        document.getElementById('current-time').textContent = new Date().toLocaleString('en-US', dateOptions);
+
+        // Chart Configurations
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.plugins.legend.labels.boxWidth = 10;
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+        
+        const donutOptions = {
+            responsive: true, maintainAspectRatio: false, cutout: '75%',
+            plugins: { 
+                legend: { position: 'bottom', labels: { padding: 10, font: { size: 9 } } },
+                tooltip: { callbacks: { label: function(context) { return context.label; } } }
+            }
+        };
+
+        // Initialize empty charts
+        const chartVolume = new Chart(document.getElementById('chart-volume').getContext('2d'), {
+            type: 'line',
+            data: { 
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], 
+                datasets: [
+                    { 
+                        label: 'Tickets Received', 
+                        data: [82, 90, 75, 100, 112, 65, 45], 
+                        borderColor: '#3b82f6', 
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)', 
+                        borderWidth: 2, 
+                        tension: 0.4, 
+                        fill: true 
+                    },
+                    { 
+                        label: 'Tickets Resolved', 
+                        data: [70, 88, 73, 95, 105, 60, 42], 
+                        borderColor: '#10b981', 
+                        backgroundColor: 'rgba(16, 185, 129, 0.05)', 
+                        borderWidth: 2, 
+                        tension: 0.4, 
+                        fill: false 
+                    }
+                ] 
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { position: 'top', labels: { padding: 15, font: { size: 11, family: "'Inter', sans-serif" }, usePointStyle: true, boxWidth: 10 } } 
+                }, 
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9', drawBorder: false } }, 
+                    x: { grid: { display: false, drawBorder: false } } 
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            }
         });
 
-        // Initialize Category Chart
-        // Global Search Functionality
-        const pages = [
-            { name: "Dashboard", url: "/dashboard", icon: "fa-chart-line" },
-            { name: "Tickets", url: "/", icon: "fa-ticket" },
-            { name: "Resolution", url: "/resolution", icon: "fa-lightbulb" },
-            { name: "AI Agent", url: "/agents", icon: "fa-robot" },
-            { name: "Integrations", url: "/integrations", icon: "fa-plug" },
-            { name: "Analytics", url: "/analytics", icon: "fa-chart-pie" }
+        const chartCat = new Chart(document.getElementById('chart-cat').getContext('2d'), {
+            type: 'bar',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#94a3b8'], borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false, beginAtZero: true }, x: { grid: { display: false, drawBorder: false }, ticks: { font: { size: 10 } } } } }
+        });
+
+        const chartPri = new Chart(document.getElementById('chart-pri').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'], borderWidth: 0 }] },
+            options: donutOptions
+        });
+
+        const chartAiEsc = new Chart(document.getElementById('chart-ai-esc').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: ['#3b82f6', '#ef4444'], borderWidth: 0 }] },
+            options: donutOptions
+        });
+
+        const chartResSucc = new Chart(document.getElementById('chart-res-succ').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] },
+            options: donutOptions
+        });
+
+        const chartClassAcc = new Chart(document.getElementById('chart-class-acc').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: ['#3b82f6', '#f59e0b'], borderWidth: 0 }] },
+            options: donutOptions
+        });
+
+        const chartKbCov = new Chart(document.getElementById('chart-kb-cov').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: ['#0ea5e9', '#64748b'], borderWidth: 0 }] },
+            options: donutOptions
+        });
+        
+        function getStatusTag(status) {
+            if(status === 'Resolved') return `<span class="tag tag-resolved">Resolved</span>`;
+            if(status === 'Escalated') return `<span class="tag tag-escalated">Escalated</span>`;
+            if(status === 'Open') return `<span class="tag tag-open">Open</span>`;
+            if(status === 'Closed') return `<span class="tag tag-resolved">Closed</span>`;
+            return `<span class="tag">${status}</span>`;
+        }
+
+        function getPriorityTag(priority) {
+            return `<span class="tag tag-${priority}">${priority}</span>`;
+        }
+
+        // Fetch Live Data
+        function fetchDashboardStats() {
+            fetch('/api/dashboard/stats')
+                .then(res => res.json())
+                .then(data => {
+                    // Update metric cards
+                    document.getElementById('val-total-tickets').innerText = data.total_tickets;
+                    document.getElementById('val-ai-res-rate').innerText = data.deflection_rate + '%';
+
+                    // Update Escalation Workflow
+                    if(document.getElementById('val-classified-today')) document.getElementById('val-classified-today').innerText = data.total_tickets;
+                    if(document.getElementById('val-resolved-auto')) document.getElementById('val-resolved-auto').innerText = data.deflected_count !== undefined ? data.deflected_count : data.resolved_count;
+                    if(document.getElementById('val-escalated-human')) document.getElementById('val-escalated-human').innerText = data.escalated_count;
+
+
+                    // Update Bar Chart
+                    chartCat.data.labels = data.categories_labels;
+                    chartCat.data.datasets[0].data = data.categories_values;
+                    chartCat.update();
+
+                    // Update Priority Chart
+                    let totalPri = data.priority_data.reduce((a, b) => a + b, 0);
+                    if (totalPri > 0) {
+                        chartPri.data.labels = [
+                            `Critical (${(data.priority_data[0]/totalPri*100).toFixed(1)}%)`,
+                            `High (${(data.priority_data[1]/totalPri*100).toFixed(1)}%)`,
+                            `Medium (${(data.priority_data[2]/totalPri*100).toFixed(1)}%)`,
+                            `Low (${(data.priority_data[3]/totalPri*100).toFixed(1)}%)`
+                        ];
+                        chartPri.data.datasets[0].data = data.priority_data;
+                        chartPri.update();
+                    }
+                    document.getElementById('inner-val-pri').innerText = totalPri;
+
+                    // Update AI Resolved vs Escalated
+                    chartAiEsc.data.labels = [`AI Resolved (${data.resolved_rate}%)`, `Escalated (${(100 - data.resolved_rate).toFixed(1)}%)`];
+                    chartAiEsc.data.datasets[0].data = [data.resolved_count, data.escalated_count];
+                    chartAiEsc.update();
+                    document.getElementById('inner-val-aiesc').innerText = data.total_tickets;
+
+                    // Update Resolution Success
+                    chartResSucc.data.labels = [`Successful (${data.resolved_rate}%)`, `Failed (${(100 - data.resolved_rate).toFixed(1)}%)`];
+                    chartResSucc.data.datasets[0].data = [data.resolved_count, data.escalated_count];
+                    chartResSucc.update();
+                    document.getElementById('inner-val-ressucc').innerText = data.resolved_rate + '%';
+
+                    // Update System Optimization Metrics in new section
+                    document.getElementById('opt-val-classacc').innerText = data.accuracy_rate + '%';
+                    document.getElementById('opt-bar-classacc').style.width = data.accuracy_rate + '%';
+                    
+                    document.getElementById('opt-val-ressuccess').innerText = data.resolved_rate + '%';
+                    document.getElementById('opt-bar-ressuccess').style.width = data.resolved_rate + '%';
+                    
+                    document.getElementById('opt-val-kbcov').innerText = data.kb_cov + '%';
+                    document.getElementById('opt-bar-kbcov').style.width = data.kb_cov + '%';
+                    
+                    // The other metrics are mocked as they don't have dynamic counterparts in the stats endpoint
+                    
+                    // Update Classification Accuracy Chart
+                    chartClassAcc.data.labels = [`Correct (${data.accuracy_rate}%)`, `Incorrect (${(100 - data.accuracy_rate).toFixed(1)}%)`];
+                    chartClassAcc.data.datasets[0].data = [data.accurate_count, data.inaccurate_count];
+                    chartClassAcc.update();
+                    document.getElementById('inner-val-classacc').innerText = data.accuracy_rate + '%';
+
+                    // Update Volume Chart
+                    if (data.volume_received && data.volume_resolved && data.volume_labels) {
+                        chartVolume.data.labels = data.volume_labels;
+                        chartVolume.data.datasets[0].data = data.volume_received;
+                        chartVolume.data.datasets[1].data = data.volume_resolved;
+                        chartVolume.update();
+                    }
+
+                    // Update KB Coverage
+                    chartKbCov.data.labels = [`With KB (${data.kb_cov}%)`, `No KB (${(100 - data.kb_cov).toFixed(1)}%)`];
+                    chartKbCov.data.datasets[0].data = [data.kb_cov, 100 - data.kb_cov];
+                    chartKbCov.update();
+                    document.getElementById('inner-val-kbcov').innerText = data.kb_cov + '%';
+
+                    // Update Tables
+                    const recentBody = document.getElementById('table-recent');
+
+                    recentBody.innerHTML = '';
+
+                    // Populate Recent Tickets Table
+                    data.recent_tickets.forEach(ticket => {
+                        recentBody.innerHTML += `
+                            <tr>
+                                <td><a href="/ticket/${ticket.id}" style="color:var(--blue);text-decoration:none;font-weight:600;">TKT-${ticket.id}</a></td>
+                                <td>${ticket.category || 'Unknown'}</td>
+                                <td>${getPriorityTag(ticket.priority)}</td>
+                                <td>${getStatusTag(ticket.status)}</td>
+                                <td>${(ticket.confidence || 0).toFixed(1)}%</td>
+                            </tr>
+                        `;
+                    });
+                })
+                .catch(err => console.error("Error fetching dashboard stats:", err));
+        }
+
+        // Initialize dashboard sync
+        fetchDashboardStats();
+        setInterval(fetchDashboardStats, 3000);
+        
+        // Navigation Search Logic
+        const navPages = [
+            { name: 'Dashboard', url: '/dashboard', icon: 'fa-chart-pie' },
+            { name: 'Tickets', url: '/', icon: 'fa-ticket' },
+            { name: 'Resolution', url: '/resolution', icon: 'fa-lightbulb' },
+            { name: 'AI Agent', url: '/agents', icon: 'fa-robot' },
+            { name: 'Integrations', url: '/integrations', icon: 'fa-plug' },
+            { name: 'Analytics', url: '/analytics', icon: 'fa-chart-simple' },
+            { name: 'Settings', url: '/settings', icon: 'fa-gear' }
         ];
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('globalSearchInput');
-            const searchResults = document.getElementById('searchResults');
-
-            if (searchInput && searchResults) {
-                searchInput.addEventListener('input', (e) => {
-                    const query = e.target.value.toLowerCase().trim();
-                    searchResults.innerHTML = '';
-
-                    if (query.length > 0) {
-                        const filtered = pages.filter(page => page.name.toLowerCase().includes(query));
-                        
-                        if (filtered.length > 0) {
-                            filtered.forEach(page => {
-                                const el = document.createElement('a');
-                                el.href = page.url;
-                                el.className = 'search-result-item';
-                                el.innerHTML = `<i class="fa-solid ${page.icon}" style="color: var(--text-muted);"></i> ${page.name}`;
-                                searchResults.appendChild(el);
-                            });
-                            searchResults.style.display = 'block';
-                        } else {
-                            searchResults.style.display = 'none';
-                        }
-                    } else {
-                        searchResults.style.display = 'none';
-                    }
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                        searchResults.style.display = 'none';
-                    }
-                });
+        function filterNavSearch() {
+            const input = document.getElementById('nav-search-input').value.toLowerCase();
+            const resultsContainer = document.getElementById('nav-search-results');
+            
+            if (!input) {
+                resultsContainer.style.display = 'none';
+                return;
             }
-            const ctx = document.getElementById('categoryChart').getContext('2d');
+
+            const filtered = navPages.filter(page => page.name.toLowerCase().includes(input));
             
-            // Data passed from backend
-            const labels = {{ categories_labels | safe }};
-            const data = {{ categories_values | safe }};
-            
-            // Provide fallback data if empty
-            const chartLabels = labels.length > 0 ? labels : ['VPN', 'Network', 'Hardware', 'Software', 'Password'];
-            const chartData = data.length > 0 ? data : [12, 19, 3, 5, 2];
-
-            window.categoryChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        label: 'Tickets',
-                        data: chartData,
-                        backgroundColor: [
-                            'rgba(79, 70, 229, 0.8)',
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(16, 185, 129, 0.8)',
-                            'rgba(245, 158, 11, 0.8)',
-                            'rgba(139, 92, 246, 0.8)'
-                        ],
-                        borderRadius: 4,
-                        barThickness: 'flex',
-                        maxBarThickness: 40
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                precision: 0,
-                                font: {
-                                    family: "'Inter', sans-serif",
-                                    size: 10
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false,
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: {
-                                    family: "'Inter', sans-serif",
-                                    size: 11
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Poll for real-time updates every 3 seconds
-            setInterval(() => {
-                fetch('/api/dashboard/stats')
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('stat-total-tickets').innerText = data.total_tickets;
-                        document.getElementById('stat-open-tickets').innerText = data.open_tickets;
-                        document.getElementById('stat-high-priority').innerText = data.high_priority;
-                        document.getElementById('stat-avg-confidence').innerText = data.avg_confidence + '%';
-                        document.getElementById('stat-deflection-rate').innerText = data.deflection_rate + '%';
-                        document.getElementById('stat-agent-total-tickets').innerText = data.total_tickets;
-                        document.getElementById('stat-agent-resolved-tickets').innerText = Math.floor(data.total_tickets * 0.4);
-
-                        const tbody = document.getElementById('recent-tickets-tbody');
-                        if (data.recent_tickets && data.recent_tickets.length > 0) {
-                            let html = '';
-                            data.recent_tickets.forEach(t => {
-                                html += `
-                                <tr style="cursor: pointer;" onclick="window.location.href='/ticket/${t.id}'">
-                                    <td style="font-weight: 600; color: var(--primary);">#T-2023-${t.id}</td>
-                                    <td>${t.title}</td>
-                                    <td>${t.category}</td>
-                                    <td><span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span></td>
-                                    <td class="status-${t.status.toLowerCase()}">${t.status}</td>
-                                </tr>`;
-                            });
-                            tbody.innerHTML = html;
-                        }
-
-                        if(window.categoryChartInstance && data.categories_labels.length > 0) {
-                            window.categoryChartInstance.data.labels = data.categories_labels;
-                            window.categoryChartInstance.data.datasets[0].data = data.categories_values;
-                            window.categoryChartInstance.update();
-                        }
-                    })
-                    .catch(err => console.error('Error fetching real-time stats:', err));
-            }, 3000);
+            if (filtered.length > 0) {
+                resultsContainer.innerHTML = filtered.map(page => 
+                    `<div onclick="window.location.href='${page.url}'" style="padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; border-bottom: 1px solid var(--border-color); transition: background 0.2s;" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'">
+                        <i class="fa-solid ${page.icon}" style="color: var(--text-muted); width: 16px;"></i> ${page.name}
+                    </div>`
+                ).join('');
+                resultsContainer.style.display = 'block';
+            } else {
+                resultsContainer.innerHTML = `<div style="padding: 10px 12px; font-size: 13px; color: var(--text-muted);">No pages found</div>`;
+                resultsContainer.style.display = 'block';
+            }
+        }
+        
+        // Close search results when clicking outside
+        document.addEventListener('click', function(event) {
+            const searchBar = document.getElementById('nav-search-input');
+            const results = document.getElementById('nav-search-results');
+            if (event.target !== searchBar && event.target !== results) {
+                results.style.display = 'none';
+            }
         });
     </script>
 </body>
-
 </html>

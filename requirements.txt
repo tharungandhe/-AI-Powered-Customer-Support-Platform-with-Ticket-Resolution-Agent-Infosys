@@ -8,3 +8,5 @@ google-genai
 Flask-JWT-Extended
 python-dotenv
 requests
+streamlit
+plotly

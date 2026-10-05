@@ -29,7 +29,10 @@ def init_db():
             confidence REAL,
             status TEXT,
             jira_ticket_id TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            resolved_at TIMESTAMP,
+            customer_rating INTEGER,
+            kb_article_used TEXT
         )
     """)
 
@@ -37,7 +40,21 @@ def init_db():
     try:
         cursor.execute("ALTER TABLE tickets ADD COLUMN jira_ticket_id TEXT")
     except sqlite3.OperationalError:
-        # Column already exists
+        pass
+        
+    try:
+        cursor.execute("ALTER TABLE tickets ADD COLUMN resolved_at TIMESTAMP")
+    except sqlite3.OperationalError:
+        pass
+        
+    try:
+        cursor.execute("ALTER TABLE tickets ADD COLUMN customer_rating INTEGER")
+    except sqlite3.OperationalError:
+        pass
+        
+    try:
+        cursor.execute("ALTER TABLE tickets ADD COLUMN kb_article_used TEXT")
+    except sqlite3.OperationalError:
         pass
 
     # Create performance indexes
